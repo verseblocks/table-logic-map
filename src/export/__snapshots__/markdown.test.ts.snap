@@ -1,0 +1,501 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`toMarkdown > matches the golden snapshot 1`] = `
+"# Table Logic Map — Project (contoso_project)
+
+Environment: Contoso DEV (https://contoso-dev.crm.dynamics.com) · Generated: 2026-03-01T10:00:00.000Z
+
+Custom · User-owned · Audit on · Duplicate detection off · Change tracking on · Activities on · Notes on
+
+3 plugin steps · 2 workflows (1 real-time / 1 background) · 2 flows · 1 business rule · 2 forms (2 handlers, 1 PCF, 1 component) · 1 key · 1 duplicate rule · 2 cascades · 1 field security profile · 1 autonumber column · 1 computed column · 2 external touchers · 2 apps · 6 views (1 quick find)
+
+## Smells
+
+- **info** \`cascade-chain\` — Cascade delete chain: contoso_project → contoso_task continues 2 levels deep
+  - Cascade delete removes child rows inside the same transaction, and each level fires the children's own delete logic (plugins, workflows, flows, further cascades). Chains of two or more levels make a single delete expensive, hard to predict and impossible to undo; consider Restrict or RemoveLink on one of the levels.
+- **info** \`disabled-clutter\` — Contoso.Plugins.ProjectAuditTrail: Update of contoso_project is disabled
+  - Disabled steps, draft processes and disabled handlers do not run but still show up in solutions, exports and the maker portal. They mislead readers about what the table does; remove them or document why they are kept.
+- **info** \`realtime-plus-plugin\` — Real-time workflow and sync plugin both on Update / Post-operation (sync)
+  - Dataverse runs real-time workflows as sync steps interleaved with plugins by execution order (rank 1 unless changed). When both exist on the same message and stage the effective order depends on ranks that are set in two different designers, so it is easy to break. Prefer one mechanism per message/stage or make the ranks explicit.
+
+## Pipeline
+
+### Create
+
+- **Pre-operation**
+  - **#1** Contoso.Plugins.ProjectNumbering: Create of contoso_project — plugin step · sync · enabled · assembly: Contoso.Plugins · version: 1.4.0.0 · type: Contoso.Plugins.ProjectNumbering · images: PreImage (Pre: contoso_code, contoso_name) · secure config: set (never exported) · config: [configuration omitted] · touches: contoso_code
+  - Project code — autonumber · rule · enabled · format: PRJ-{SEQNUM:5} · touches: contoso_code
+  - Projects with the same name — duplicate rule · sync · enabled · matching table: contoso_project · status: Published · touches: contoso_name
+- **After commit (async)** _(After commit — order not guaranteed)_
+  - Create kickoff tasks — workflow · background · enabled · scope: Organization · on demand · touches: contoso_accountid, contoso_name · confidence: heuristic
+  - Notify PM "on create" [v2] — cloud flow · async · enabled · scope: Organization · run as: Flow owner
+- **Always (data rule)**
+  - Project code — alternate key · rule · enabled · columns: contoso_code · status: Active · touches: contoso_code
+
+### Update
+
+- **Pre-operation**
+  - Projects with the same name — duplicate rule · sync · enabled · matching table: contoso_project · status: Published · touches: contoso_name
+- **Post-operation (sync)** _(Same rank — order between plugins and real-time workflows is not guaranteed)_
+  - **#1** Contoso.Plugins.ProjectRollup: Update of contoso_project — plugin step · sync · enabled · filtering: contoso_budget, contoso_status · assembly: Contoso.Plugins · version: 1.4.0.0 · type: Contoso.Plugins.ProjectRollup · images: PostImage (Post: contoso_budget); PreImage (Pre: all columns) · touches: contoso_margin · smells: realtime-plus-plugin
+  - Validate budget — workflow · real-time · enabled · filtering: contoso_budget · scope: Organization · touches: contoso_budget, contoso_margin · confidence: heuristic · smells: realtime-plus-plugin
+- **After commit (async)** _(After commit — order not guaranteed)_
+  - **#2** Contoso.Plugins.ProjectAuditTrail: Update of contoso_project — plugin step · async · disabled · filtering: any column · assembly: Contoso.Plugins · version: 1.2.0.0 · type: Contoso.Plugins.ProjectAuditTrail · images: PreImage (Pre: all columns) · smells: disabled-clutter
+  - Sync budget to finance — cloud flow · async · enabled · filtering: contoso_budget, contoso_margin · scope: Organization · filter: statecode eq 0 · run as: Flow owner
+- **Always (data rule)**
+  - Project code — alternate key · rule · enabled · columns: contoso_code · status: Active · touches: contoso_code
+
+### Delete
+
+- **Always (data rule)**
+  - Delete → Cascade to contoso_task — cascade · rule · enabled · child: contoso_task · via: contoso_projectid · behaviour: Cascade · relationship: contoso_project_tasks · smells: cascade-chain
+
+### Assign
+
+- **Always (data rule)**
+  - Assign → Cascade to contoso_task — cascade · rule · enabled · child: contoso_task · via: contoso_projectid · behaviour: Cascade · relationship: contoso_project_tasks
+
+### FormLoad
+
+- **Client (form)**
+  - Contoso.Controls.BudgetGauge — PCF control · client · enabled · form: Project · column: contoso_budget · tab: General · section: Financials · touches: contoso_budget
+  - Contoso.Project.onLoad — form script · client · enabled · form: Project · library: contoso_/scripts/project.js · function: Contoso.Project.onLoad · form event: onload
+  - Default region — business rule · rule · enabled · form: Project · scope: Form · actions: SetDefaultValue, SetVisibility · touches: contoso_region · confidence: heuristic
+  - IFrame: IFRAME_Portal — form component · client · enabled · form: Project · type: IFrame · url: https://portal.contoso.com/projects?… · tab: Portal · section: Portal
+
+### FormSave
+
+- **Client (form)**
+  - Name — required column · client · enabled · level: ApplicationRequired · touches: contoso_name
+
+### FieldChange
+
+- **Client (form)**
+  - Contoso.Project.onRegionChange — form script · client · enabled · filtering: contoso_region · form: Project · library: contoso_/scripts/project.js · function: Contoso.Project.onRegionChange · form event: onchange
+  - Default region — business rule · rule · enabled · filtering: contoso_accountid · form: Project · scope: Form · actions: SetDefaultValue, SetVisibility · touches: contoso_region · confidence: heuristic
+
+### Any
+
+- **Always (data rule)**
+  - Auditing — audit · rule · enabled · note: Auditing is on for the organization and for the table; audited columns are recorded on Create, Update and Delete.
+  - Finance managers — field security profile · rule · enabled · profile: Finance managers · touches: contoso_confidentialnotes
+  - Margin — formula column · rule · enabled · formula: contoso_budget * 0.2 · touches: contoso_budget · confidence: heuristic
+
+## Forms
+
+### Project (Main · Active · default)
+
+Libraries: contoso_/scripts/project.js
+
+**Handlers**
+
+| Event | Column / control | Function | Library | Enabled | Pass context | Parameters |
+|---|---|---|---|---|---|---|
+| onload | — | Contoso.Project.onLoad | contoso_/scripts/project.js | yes | yes | — |
+| onchange | contoso_region | Contoso.Project.onRegionChange | contoso_/scripts/project.js | yes | yes | "EMEA\\|APAC" |
+
+**PCF and components**
+
+| Type | Name | Column | Location | Details |
+|---|---|---|---|---|
+| PCF | Contoso.Controls.BudgetGauge | contoso_budget | General › Financials | region body |
+| IFrame | IFrame: IFRAME_Portal | — | Portal › Portal | url https://portal.contoso.com/projects?…, region body |
+
+Business rules: Default region (form)
+
+### Project quick create (Quick Create · Active)
+
+Libraries: none
+
+**Handlers**
+
+_None_
+
+**PCF and components**
+
+_None_
+
+Business rules: none
+
+## Columns
+
+10 of 14 columns with logic (triggers, touched by, required, secured, audited or computed).
+
+| Column | Display name | Type | Flags | Source | Triggers | Touched by |
+|---|---|---|---|---|---|---|
+| contoso_accountid | Customer | Lookup | — | simple | Default region | Create kickoff tasks |
+| contoso_budget | Budget | Money | audited | simple | Contoso.Plugins.ProjectRollup: Update of contoso_project, Sync budget to finance, Validate budget | Contoso.Controls.BudgetGauge, Margin, Validate budget |
+| contoso_code | Project code | String | — | autonumber PRJ-{SEQNUM:5} | — | Contoso.Plugins.ProjectNumbering: Create of contoso_project, Project code |
+| contoso_confidentialnotes | Confidential notes | Memo | secured | simple | — | Finance managers |
+| contoso_margin | Margin | Decimal | — | formula | Sync budget to finance | Contoso.Plugins.ProjectRollup: Update of contoso_project, Validate budget |
+| contoso_name | Name | String | required, audited | simple | — | Create kickoff tasks, Name, Projects with the same name |
+| contoso_projectid | Project | Uniqueidentifier | required | simple | — | — |
+| contoso_region | Region | Picklist | — | simple | Contoso.Project.onRegionChange | Default region |
+| contoso_status | Project status | Picklist | — | simple | Contoso.Plugins.ProjectRollup: Update of contoso_project | — |
+| ownerid | Owner | Owner | required, system | simple | — | — |
+
+## Data rules
+
+### Keys
+
+- Project code (Active): contoso_code
+
+### Duplicate rules
+
+- Projects with the same name (Published) — contoso_project ↔ contoso_project
+  - contoso_name ↔ contoso_name (Exact Match, ignore blanks)
+
+### Cascades
+
+- contoso_project → contoso_task (via contoso_projectid)
+  - Assign: Cascade
+  - Delete: Cascade (chain depth 2)
+
+### Field security profiles
+
+- Finance managers: contoso_confidentialnotes (read Allowed, create Not Allowed, update Allowed)
+
+### Audit
+
+- Auditing: effective (organization on, table on) — Auditing is on for the organization and for the table; audited columns are recorded on Create, Update and Delete.
+- Audited columns: contoso_budget, contoso_name
+
+### Required columns
+
+- contoso_name (Name), contoso_projectid (Project), ownerid (Owner)
+
+## Touched by
+
+Flows and actions that read or write contoso_project without being triggered by it.
+
+### Write
+
+- Close stale projects — cloud flow · disabled · trigger: recurrence · operations: ListRecords (List_stale_projects), UpdateRecord (Apply_to_each/Update_project) · touches: statecode, statuscode
+
+### Read
+
+- Weekly project digest — cloud flow · enabled · trigger: recurrence · operations: ListRecords (List_projects)
+
+## Apps
+
+| App | Unique name | State | Managed |
+|---|---|---|---|
+| Contoso Field Service | contoso_FieldService | Active | yes |
+| Project Hub | contoso_ProjectHub | Active | no |
+
+## Other dependencies
+
+Components that depend on the table and are not represented above (views, charts, dashboards, ...).
+
+| Component type | Name | Object id |
+|---|---|---|
+| Saved Query (26) | Active Projects | e1f2a3b4-00a1-4000-8000-0000000000a1 |
+
+## Source errors
+
+- **customApis** (permission): HTTP 403: Principal user is missing prvReadCustomAPI privilege — this map is missing what that source would have found
+"
+`;
+
+exports[`toMarkdown > matches the golden snapshot with every option on 1`] = `
+"# Table Logic Map — Project (contoso_project)
+
+Environment: Contoso DEV (https://contoso-dev.crm.dynamics.com) · Generated: 2026-03-01T10:00:00.000Z
+
+Custom · User-owned · Audit on · Duplicate detection off · Change tracking on · Activities on · Notes on
+
+3 plugin steps · 2 workflows (1 real-time / 1 background) · 2 flows · 1 business rule · 2 forms (2 handlers, 1 PCF, 1 component) · 1 key · 1 duplicate rule · 2 cascades · 1 field security profile · 1 autonumber column · 1 computed column · 2 external touchers · 2 apps · 6 views (1 quick find)
+
+## Smells
+
+- **info** \`cascade-chain\` — Cascade delete chain: contoso_project → contoso_task continues 2 levels deep
+  - Cascade delete removes child rows inside the same transaction, and each level fires the children's own delete logic (plugins, workflows, flows, further cascades). Chains of two or more levels make a single delete expensive, hard to predict and impossible to undo; consider Restrict or RemoveLink on one of the levels.
+- **info** \`disabled-clutter\` — Contoso.Plugins.ProjectAuditTrail: Update of contoso_project is disabled
+  - Disabled steps, draft processes and disabled handlers do not run but still show up in solutions, exports and the maker portal. They mislead readers about what the table does; remove them or document why they are kept.
+- **info** \`realtime-plus-plugin\` — Real-time workflow and sync plugin both on Update / Post-operation (sync)
+  - Dataverse runs real-time workflows as sync steps interleaved with plugins by execution order (rank 1 unless changed). When both exist on the same message and stage the effective order depends on ranks that are set in two different designers, so it is easy to break. Prefer one mechanism per message/stage or make the ranks explicit.
+
+## Pipeline
+
+### Create
+
+- **Pre-operation**
+  - **#1** Contoso.Plugins.ProjectNumbering: Create of contoso_project — plugin step · sync · enabled · assembly: Contoso.Plugins · version: 1.4.0.0 · type: Contoso.Plugins.ProjectNumbering · images: PreImage (Pre: contoso_code, contoso_name) · secure config: set (never exported) · config: UNSECURE-CONFIG-VALUE · touches: contoso_code
+  - Project code — autonumber · rule · enabled · format: PRJ-{SEQNUM:5} · touches: contoso_code
+  - Projects with the same name — duplicate rule · sync · enabled · matching table: contoso_project · status: Published · touches: contoso_name
+- **After commit (async)** _(After commit — order not guaranteed)_
+  - Create kickoff tasks — workflow · background · enabled · scope: Organization · on demand · touches: contoso_accountid, contoso_name · confidence: heuristic
+  - Notify PM "on create" [v2] — cloud flow · async · enabled · scope: Organization · run as: Flow owner
+- **Always (data rule)**
+  - Project code — alternate key · rule · enabled · columns: contoso_code · status: Active · touches: contoso_code
+
+### Update
+
+- **Pre-operation**
+  - Projects with the same name — duplicate rule · sync · enabled · matching table: contoso_project · status: Published · touches: contoso_name
+- **Post-operation (sync)** _(Same rank — order between plugins and real-time workflows is not guaranteed)_
+  - **#1** Contoso.Plugins.ProjectRollup: Update of contoso_project — plugin step · sync · enabled · filtering: contoso_budget, contoso_status · assembly: Contoso.Plugins · version: 1.4.0.0 · type: Contoso.Plugins.ProjectRollup · images: PostImage (Post: contoso_budget); PreImage (Pre: all columns) · touches: contoso_margin · smells: realtime-plus-plugin
+  - Validate budget — workflow · real-time · enabled · filtering: contoso_budget · scope: Organization · touches: contoso_budget, contoso_margin · confidence: heuristic · smells: realtime-plus-plugin
+- **After commit (async)** _(After commit — order not guaranteed)_
+  - **#2** Contoso.Plugins.ProjectAuditTrail: Update of contoso_project — plugin step · async · disabled · filtering: any column · assembly: Contoso.Plugins · version: 1.2.0.0 · type: Contoso.Plugins.ProjectAuditTrail · images: PreImage (Pre: all columns) · smells: disabled-clutter
+  - Sync budget to finance — cloud flow · async · enabled · filtering: contoso_budget, contoso_margin · scope: Organization · filter: statecode eq 0 · run as: Flow owner
+- **Always (data rule)**
+  - Project code — alternate key · rule · enabled · columns: contoso_code · status: Active · touches: contoso_code
+
+### Delete
+
+- **Always (data rule)**
+  - Delete → Cascade to contoso_task — cascade · rule · enabled · child: contoso_task · via: contoso_projectid · behaviour: Cascade · relationship: contoso_project_tasks · smells: cascade-chain
+
+### Assign
+
+- **Always (data rule)**
+  - Assign → Cascade to contoso_task — cascade · rule · enabled · child: contoso_task · via: contoso_projectid · behaviour: Cascade · relationship: contoso_project_tasks
+
+### FormLoad
+
+- **Client (form)**
+  - Contoso.Controls.BudgetGauge — PCF control · client · enabled · form: Project · column: contoso_budget · tab: General · section: Financials · touches: contoso_budget
+  - Contoso.Project.onLoad — form script · client · enabled · form: Project · library: contoso_/scripts/project.js · function: Contoso.Project.onLoad · form event: onload
+  - Default region — business rule · rule · enabled · form: Project · scope: Form · actions: SetDefaultValue, SetVisibility · touches: contoso_region · confidence: heuristic
+  - IFrame: IFRAME_Portal — form component · client · enabled · form: Project · type: IFrame · url: https://portal.contoso.com/projects?… · tab: Portal · section: Portal
+
+### FormSave
+
+- **Client (form)**
+  - Name — required column · client · enabled · level: ApplicationRequired · touches: contoso_name
+
+### FieldChange
+
+- **Client (form)**
+  - Contoso.Project.onRegionChange — form script · client · enabled · filtering: contoso_region · form: Project · library: contoso_/scripts/project.js · function: Contoso.Project.onRegionChange · form event: onchange
+  - Default region — business rule · rule · enabled · filtering: contoso_accountid · form: Project · scope: Form · actions: SetDefaultValue, SetVisibility · touches: contoso_region · confidence: heuristic
+
+### Any
+
+- **Always (data rule)**
+  - Auditing — audit · rule · enabled · note: Auditing is on for the organization and for the table; audited columns are recorded on Create, Update and Delete.
+  - Finance managers — field security profile · rule · enabled · profile: Finance managers · touches: contoso_confidentialnotes
+  - Margin — formula column · rule · enabled · formula: contoso_budget * 0.2 · touches: contoso_budget · confidence: heuristic
+
+## Forms
+
+### Project (Main · Active · default)
+
+Libraries: contoso_/scripts/project.js
+
+**Handlers**
+
+| Event | Column / control | Function | Library | Enabled | Pass context | Parameters |
+|---|---|---|---|---|---|---|
+| onload | — | Contoso.Project.onLoad | contoso_/scripts/project.js | yes | yes | — |
+| onchange | contoso_region | Contoso.Project.onRegionChange | contoso_/scripts/project.js | yes | yes | "EMEA\\|APAC" |
+
+**PCF and components**
+
+| Type | Name | Column | Location | Details |
+|---|---|---|---|---|
+| PCF | Contoso.Controls.BudgetGauge | contoso_budget | General › Financials | region body |
+| IFrame | IFrame: IFRAME_Portal | — | Portal › Portal | url https://portal.contoso.com/projects?…, region body |
+
+Business rules: Default region (form)
+
+### Project quick create (Quick Create · Active)
+
+Libraries: none
+
+**Handlers**
+
+_None_
+
+**PCF and components**
+
+_None_
+
+Business rules: none
+
+## Columns
+
+All 14 columns.
+
+| Column | Display name | Type | Flags | Source | Triggers | Touched by |
+|---|---|---|---|---|---|---|
+| contoso_accountid | Customer | Lookup | — | simple | Default region | Create kickoff tasks |
+| contoso_budget | Budget | Money | audited | simple | Contoso.Plugins.ProjectRollup: Update of contoso_project, Sync budget to finance, Validate budget | Contoso.Controls.BudgetGauge, Margin, Validate budget |
+| contoso_code | Project code | String | — | autonumber PRJ-{SEQNUM:5} | — | Contoso.Plugins.ProjectNumbering: Create of contoso_project, Project code |
+| contoso_confidentialnotes | Confidential notes | Memo | secured | simple | — | Finance managers |
+| contoso_enddate | End date | DateTime | — | simple | — | — |
+| contoso_margin | Margin | Decimal | — | formula | Sync budget to finance | Contoso.Plugins.ProjectRollup: Update of contoso_project, Validate budget |
+| contoso_name | Name | String | required, audited | simple | — | Create kickoff tasks, Name, Projects with the same name |
+| contoso_projectid | Project | Uniqueidentifier | required | simple | — | — |
+| contoso_region | Region | Picklist | — | simple | Contoso.Project.onRegionChange | Default region |
+| contoso_startdate | Start date | DateTime | — | simple | — | — |
+| contoso_status | Project status | Picklist | — | simple | Contoso.Plugins.ProjectRollup: Update of contoso_project | — |
+| ownerid | Owner | Owner | required, system | simple | — | — |
+| statecode | Status | State | system | simple | — | — |
+| statuscode | Status reason | Status | system | simple | — | — |
+
+## Data rules
+
+### Keys
+
+- Project code (Active): contoso_code
+
+### Duplicate rules
+
+- Projects with the same name (Published) — contoso_project ↔ contoso_project
+  - contoso_name ↔ contoso_name (Exact Match, ignore blanks)
+
+### Cascades
+
+- contoso_project → contoso_task (via contoso_projectid)
+  - Assign: Cascade
+  - Delete: Cascade (chain depth 2)
+
+### Field security profiles
+
+- Finance managers: contoso_confidentialnotes (read Allowed, create Not Allowed, update Allowed)
+
+### Audit
+
+- Auditing: effective (organization on, table on) — Auditing is on for the organization and for the table; audited columns are recorded on Create, Update and Delete.
+- Audited columns: contoso_budget, contoso_name
+
+### Required columns
+
+- contoso_name (Name), contoso_projectid (Project), ownerid (Owner)
+
+## Touched by
+
+Flows and actions that read or write contoso_project without being triggered by it.
+
+### Write
+
+- Close stale projects — cloud flow · disabled · trigger: recurrence · operations: ListRecords (List_stale_projects), UpdateRecord (Apply_to_each/Update_project) · touches: statecode, statuscode
+
+### Read
+
+- Weekly project digest — cloud flow · enabled · trigger: recurrence · operations: ListRecords (List_projects)
+
+## Apps
+
+| App | Unique name | State | Managed |
+|---|---|---|---|
+| Contoso Field Service | contoso_FieldService | Active | yes |
+| Project Hub | contoso_ProjectHub | Active | no |
+
+## Other dependencies
+
+Components that depend on the table and are not represented above (views, charts, dashboards, ...).
+
+| Component type | Name | Object id |
+|---|---|---|
+| Saved Query (26) | Active Projects | e1f2a3b4-00a1-4000-8000-0000000000a1 |
+
+## Source errors
+
+- **customApis** (permission): HTTP 403: Principal user is missing prvReadCustomAPI privilege — this map is missing what that source would have found
+
+## Diagrams
+
+### Create
+
+\`\`\`mermaid
+flowchart LR
+  subgraph preoperation["Pre-operation"]
+    n1["#1 Contoso.Plugins.ProjectNumbering: Create of contoso_proj…"]
+    n2["Project code"]
+    n3["Projects with the same name"]
+  end
+  subgraph postcommit["After commit (async)"]
+    n4["Create kickoff tasks"]
+    n5["Notify PM 'on create' (v2)"]
+  end
+  subgraph always["Always (data rule)"]
+    n6["Project code"]
+  end
+  preoperation --> postcommit
+\`\`\`
+
+### Update
+
+\`\`\`mermaid
+flowchart LR
+  subgraph preoperation["Pre-operation"]
+    n1["Projects with the same name"]
+  end
+  subgraph postoperation["Post-operation (sync)"]
+    n2["#1 Contoso.Plugins.ProjectRollup: Update of contoso_project"]
+    n3["Validate budget"]
+  end
+  subgraph postcommit["After commit (async)"]
+    n4["#2 Contoso.Plugins.ProjectAuditTrail: Update of contoso_pro…"]
+    n5["Sync budget to finance"]
+  end
+  subgraph always["Always (data rule)"]
+    n6["Project code"]
+  end
+  preoperation --> postoperation --> postcommit
+\`\`\`
+
+### Delete
+
+\`\`\`mermaid
+flowchart LR
+  subgraph always["Always (data rule)"]
+    n1["Delete → Cascade to contoso_task"]
+  end
+\`\`\`
+
+### Assign
+
+\`\`\`mermaid
+flowchart LR
+  subgraph always["Always (data rule)"]
+    n1["Assign → Cascade to contoso_task"]
+  end
+\`\`\`
+
+### FormLoad
+
+\`\`\`mermaid
+flowchart LR
+  subgraph client["Client (form)"]
+    n1["Contoso.Controls.BudgetGauge"]
+    n2["Contoso.Project.onLoad"]
+    n3["Default region"]
+    n4["IFrame: IFRAME_Portal"]
+  end
+\`\`\`
+
+### FormSave
+
+\`\`\`mermaid
+flowchart LR
+  subgraph client["Client (form)"]
+    n1["Name"]
+  end
+\`\`\`
+
+### FieldChange
+
+\`\`\`mermaid
+flowchart LR
+  subgraph client["Client (form)"]
+    n1["Contoso.Project.onRegionChange"]
+    n2["Default region"]
+  end
+\`\`\`
+
+### Any
+
+\`\`\`mermaid
+flowchart LR
+  subgraph always["Always (data rule)"]
+    n1["Auditing"]
+    n2["Finance managers"]
+    n3["Margin"]
+  end
+\`\`\`
+"
+`;

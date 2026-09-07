@@ -1,0 +1,37 @@
+{
+    "@odata.context": "https://org.crm.dynamics.com/api/data/v9.2/$metadata#Microsoft.Dynamics.CRM.RetrieveDependenciesForDeleteResponse",
+    "EntityCollection": {
+        "EntityName": "dependency",
+        "MoreRecords": false,
+        "Entities": [
+            {
+                "LogicalName": "dependency",
+                "Id": "a1a1a1a1-0000-4000-8000-000000000011",
+                "Attributes": [
+                    { "key": "dependencyid", "value": "a1a1a1a1-0000-4000-8000-000000000011" },
+                    { "key": "dependencytype", "value": { "Value": 2 } },
+                    { "key": "dependentcomponenttype", "value": { "Value": 60 } },
+                    { "key": "dependentcomponentobjectid", "value": "{E4E4E4E4-0000-4000-8000-000000000002}" },
+                    { "key": "requiredcomponenttype", "value": { "Value": 1 } },
+                    { "key": "requiredcomponentobjectid", "value": "aaaaaaaa-0000-4000-8000-000000000001" }
+                ],
+                "FormattedValues": [
+                    { "key": "dependencytype", "value": "Published" },
+                    { "key": "dependentcomponenttype", "value": "System Form" }
+                ]
+            },
+            {
+                "LogicalName": "dependency",
+                "Id": "a1a1a1a1-0000-4000-8000-000000000012",
+                "Attributes": [
+                    { "Key": "dependencyid", "Value": "a1a1a1a1-0000-4000-8000-000000000012" },
+                    { "Key": "dependencytype", "Value": 2 },
+                    { "Key": "dependentcomponenttype", "Value": 10 },
+                    { "Key": "dependentcomponentobjectid", "Value": "b6b6b6b6-0000-4000-8000-000000000001" },
+                    { "Key": "requiredcomponenttype", "Value": 1 },
+                    { "Key": "requiredcomponentobjectid", "Value": { "Id": "aaaaaaaa-0000-4000-8000-000000000001", "LogicalName": "entity" } }
+                ]
+            }
+        ]
+    }
+}

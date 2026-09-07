@@ -1,0 +1,65 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": { "connectionReferenceLogicalName": "contoso_sharedcommondataserviceforapps_1a2b3" },
+        "api": { "name": "shared_commondataserviceforapps" }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": { "defaultValue": {}, "type": "Object" },
+        "$authentication": { "defaultValue": {}, "type": "SecureObject" }
+      },
+      "triggers": {
+        "When_a_project_is_updated": {
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "SubscribeWebhookTrigger"
+            },
+            "parameters": {
+              "subscriptionRequest/message": 3,
+              "subscriptionRequest/entityname": "contoso_project",
+              "subscriptionRequest/scope": 2,
+              "subscriptionRequest/filterexpression": "contoso_status eq 2 and statecode eq 0",
+              "subscriptionRequest/runas": 2
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Compose_summary": {
+          "runAfter": {},
+          "type": "Compose",
+          "inputs": "Project @{triggerOutputs()?['body/contoso_name']} was reviewed"
+        },
+        "Update_project": {
+          "runAfter": { "Compose_summary": ["Succeeded"] },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "UpdateRecord"
+            },
+            "parameters": {
+              "entityName": "contoso_projects",
+              "recordId": "@triggerOutputs()?['body/contoso_projectid']",
+              "item/contoso_reviewed": true,
+              "item/contoso_apikey": "hard-coded-secret-value"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      }
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

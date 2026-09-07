@@ -1,0 +1,60 @@
+{
+    "invocation": {
+        "version": "1.0.0",
+        "capabilities": ["table-logic-map"],
+        "prefill": {
+            "description": "Pass 'entityName' (table logical name) to open the map for that table immediately. All fields are optional; with no prefill the tool opens on the table picker.",
+            "properties": {
+                "entityName": {
+                    "type": "string",
+                    "description": "Table logical name, e.g. account or contoso_project"
+                },
+                "includeSystemSteps": {
+                    "type": "boolean",
+                    "description": "Include hidden Microsoft/system plugin steps (default false)"
+                },
+                "events": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Optional event filter; omit for all events. Well-known names are matched case-insensitively: Create, Update, Delete, Assign, SetState, Merge, Share, Unshare, Associate, Disassociate, Retrieve, RetrieveMultiple, AddToQueue, Qualify, Win, Lose, FormLoad, FormSave, FieldChange, Any. Custom API / action and other SDK messages use \"Custom:<message>\" or \"Message:<message>\" (message name case-sensitive). Unknown values are rejected with an error."
+                },
+                "includeDiagrams": {
+                    "type": "boolean",
+                    "description": "Append Mermaid pipeline diagrams to the Markdown report (headless execution mode, default false)"
+                },
+                "maxSyncItems": {
+                    "type": "number",
+                    "description": "Flag an event/stage as stacked once it holds more than this many synchronous items (the 'too-many-sync' smell). Positive integer; default 5, matching the tool's smells.maxSyncItems setting."
+                }
+            }
+        },
+        "returnTopic": {
+            "description": "Returns the structured logic map (schemaVersion 1) plus a Markdown report for the requested table.",
+            "properties": {
+                "logicMap": {
+                    "type": "object",
+                    "description": "LogicMap JSON: table facts, items, pipeline[event][stage], columns, forms, externalTouchers, apps, dependencies, smells, sourceErrors"
+                },
+                "markdown": {
+                    "type": "string",
+                    "description": "Human-readable Markdown report of the same map"
+                },
+                "error": {
+                    "type": "string",
+                    "description": "Present only when the run could not complete normally: an invalid input, or a windowed run that failed, was cancelled or hit the caller's timeout (logicMap then holds the partial map). Absent on success, so read it when present but do not require it."
+                }
+            }
+        }
+    },
+    "agents": {
+        "version": "1.0.0",
+        "invokable": true,
+        "modes": ["one-way", "two-way"],
+        "defaultMode": "two-way",
+        "timeoutMS": 120000,
+        "headless": true,
+        "executionModes": ["windowed", "headless"],
+        "defaultExecutionMode": "headless",
+        "headlessEntry": "dist/headless.js"
+    }
+}

@@ -1,0 +1,96 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataservice": {
+        "runtimeSource": "embedded",
+        "connection": { "connectionReferenceLogicalName": "contoso_sharedcommondataservice_9z8y7" },
+        "api": { "name": "shared_commondataservice" }
+      },
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": { "connectionReferenceLogicalName": "contoso_sharedsharepointonline_5d6e7" },
+        "api": { "name": "shared_sharepointonline" }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": { "defaultValue": {}, "type": "Object" },
+        "$authentication": { "defaultValue": {}, "type": "SecureObject" }
+      },
+      "triggers": {
+        "When_a_record_is_created": {
+          "recurrence": { "frequency": "Minute", "interval": 1 },
+          "splitOn": "@triggerBody()?['value']",
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataservice",
+              "operationId": "GetOnNewItems"
+            },
+            "parameters": {
+              "dataset": "org12345.crm",
+              "table": "contoso_projects"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "List_tasks": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataservice",
+              "operationId": "GetItems"
+            },
+            "parameters": {
+              "dataset": "org12345.crm",
+              "table": "contoso_tasks",
+              "$filter": "_contoso_projectid_value eq @{triggerBody()?['contoso_projectid']}"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Update_project": {
+          "runAfter": { "List_tasks": ["Succeeded"] },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataservice",
+              "connectionName": "shared_commondataservice",
+              "operationId": "PatchItem"
+            },
+            "parameters": {
+              "dataset": "org12345.crm",
+              "table": "contoso_projects",
+              "id": "@triggerBody()?['contoso_projectid']",
+              "item/contoso_taskcount": "@length(body('List_tasks')?['value'])"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Get_sharepoint_item": {
+          "runAfter": { "Update_project": ["Succeeded"] },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItem"
+            },
+            "parameters": {
+              "dataset": "https://contoso.sharepoint.com/sites/projects",
+              "table": "11111111-2222-3333-4444-555555555555",
+              "id": 1
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      }
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

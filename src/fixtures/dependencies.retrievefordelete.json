@@ -1,0 +1,70 @@
+{
+    "@odata.context": "https://org.crm.dynamics.com/api/data/v9.2/$metadata#Microsoft.Dynamics.CRM.RetrieveDependenciesForDeleteResponse",
+    "EntityCollection": {
+        "EntityName": "dependency",
+        "MoreRecords": false,
+        "PagingCookie": "",
+        "TotalRecordCount": -1,
+        "TotalRecordCountLimitExceeded": false,
+        "MinActiveRowVersion": "-1",
+        "Entities": [
+            {
+                "@odata.type": "#Microsoft.Dynamics.CRM.dependency",
+                "dependencyid": "a1a1a1a1-0000-4000-8000-000000000001",
+                "dependencytype": 2,
+                "dependentcomponenttype": 92,
+                "dependentcomponentobjectid": "11111111-1111-4111-8111-000000000002",
+                "dependentcomponentnodeid": "b1b1b1b1-0000-4000-8000-000000000001",
+                "dependentcomponentbasesolutionid": "fd140aaf-4df4-11dd-bd17-0019b9312238",
+                "requiredcomponenttype": 1,
+                "requiredcomponentobjectid": "aaaaaaaa-0000-4000-8000-000000000001",
+                "requiredcomponentnodeid": "b1b1b1b1-0000-4000-8000-000000000002"
+            },
+            {
+                "@odata.type": "#Microsoft.Dynamics.CRM.dependency",
+                "dependencyid": "a1a1a1a1-0000-4000-8000-000000000002",
+                "dependencytype": 2,
+                "dependentcomponenttype": 26,
+                "dependentcomponentobjectid": "{C2C2C2C2-0000-4000-8000-000000000001}",
+                "requiredcomponenttype": 1,
+                "requiredcomponentobjectid": "aaaaaaaa-0000-4000-8000-000000000001"
+            },
+            {
+                "@odata.type": "#Microsoft.Dynamics.CRM.dependency",
+                "dependencyid": "a1a1a1a1-0000-4000-8000-000000000003",
+                "dependencytype": 2,
+                "dependentcomponenttype": 26,
+                "dependentcomponentobjectid": "c2c2c2c2-0000-4000-8000-000000000001",
+                "requiredcomponenttype": 1,
+                "requiredcomponentobjectid": "aaaaaaaa-0000-4000-8000-000000000001"
+            },
+            {
+                "@odata.type": "#Microsoft.Dynamics.CRM.dependency",
+                "dependencyid": "a1a1a1a1-0000-4000-8000-000000000004",
+                "dependencytype": 2,
+                "dependentcomponenttype": 10021,
+                "dependentcomponentobjectid": "d3d3d3d3-0000-4000-8000-000000000001",
+                "requiredcomponenttype": 1,
+                "requiredcomponentobjectid": "aaaaaaaa-0000-4000-8000-000000000001"
+            },
+            {
+                "@odata.type": "#Microsoft.Dynamics.CRM.dependency",
+                "dependencyid": "a1a1a1a1-0000-4000-8000-000000000005",
+                "dependencytype": 1,
+                "dependentcomponenttype": 24,
+                "dependentcomponentobjectid": "e4e4e4e4-0000-4000-8000-000000000001",
+                "requiredcomponenttype": 1,
+                "requiredcomponentobjectid": "aaaaaaaa-0000-4000-8000-000000000001"
+            },
+            {
+                "@odata.type": "#Microsoft.Dynamics.CRM.dependency",
+                "dependencyid": "a1a1a1a1-0000-4000-8000-000000000006",
+                "dependencytype": 2,
+                "dependentcomponenttype": 29,
+                "dependentcomponentobjectid": "f5f5f5f5-0000-4000-8000-000000000001",
+                "requiredcomponenttype": 1,
+                "requiredcomponentobjectid": "aaaaaaaa-0000-4000-8000-000000000001"
+            }
+        ]
+    }
+}

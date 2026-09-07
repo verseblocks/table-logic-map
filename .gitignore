@@ -1,0 +1,38 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Build output
+dist/
+
+# Vitest
+coverage/
+
+# dotenv environment variable files
+.env
+.env.*
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Local agent state. The vendored pptb-tool-dev skill is GPL-3.0 while this project is
+# MIT, so it stays out of the repository; reinstall it from PowerPlatformToolBox/pptb-agent-skills.
+.claude/
+
+# Exports produced by running the tool against a real environment. These contain a customer's
+# org URL, schema prefixes and logic inventory, so they must never be committed. Anchored to the
+# repository root so docs/assets/sample-logic-map.html (built from the anonymized fixture) is kept.
+/*-logic-map.md
+/*-logic-map.json
+/*-logic-map.html

@@ -1,0 +1,85 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": { "connectionReferenceLogicalName": "contoso_sharedcommondataserviceforapps_1a2b3" },
+        "api": { "name": "shared_commondataserviceforapps" }
+      },
+      "shared_teams": {
+        "runtimeSource": "embedded",
+        "connection": { "connectionReferenceLogicalName": "contoso_sharedteams_7e8f9" },
+        "api": { "name": "shared_teams" }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": { "defaultValue": {}, "type": "Object" },
+        "$authentication": { "defaultValue": {}, "type": "SecureObject" }
+      },
+      "triggers": {
+        "When_a_row_is_selected": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "GetOnNewSelectedRecord"
+            },
+            "parameters": {
+              "entityname": "contoso_project"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "List_open_tasks": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "ListRecords"
+            },
+            "parameters": {
+              "entityName": "contoso_tasks",
+              "$filter": "_contoso_projectid_value eq @{triggerOutputs()?['body/entity/contoso_projectid']} and statecode eq 0"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Condition_has_tasks": {
+          "runAfter": { "List_open_tasks": ["Succeeded"] },
+          "type": "If",
+          "expression": { "and": [{ "greater": ["@length(outputs('List_open_tasks')?['body/value'])", 0] }] },
+          "actions": {
+            "Post_message_in_Teams": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams",
+                  "connectionName": "shared_teams",
+                  "operationId": "PostMessageToConversation"
+                },
+                "parameters": {
+                  "poster": "Flow bot",
+                  "location": "Channel",
+                  "body/recipient/groupId": "00000000-0000-0000-0000-000000000000",
+                  "body/messageBody": "<p>Open tasks on @{triggerOutputs()?['body/entity/contoso_name']}</p>"
+                }
+              }
+            }
+          },
+          "else": {
+            "actions": {}
+          }
+        }
+      }
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,199 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": { "connectionReferenceLogicalName": "contoso_sharedcommondataserviceforapps_1a2b3" },
+        "api": { "name": "shared_commondataserviceforapps" }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": { "connectionReferenceLogicalName": "contoso_sharedoffice365_4c5d6" },
+        "api": { "name": "shared_office365" }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": { "defaultValue": {}, "type": "Object" },
+        "$authentication": { "defaultValue": {}, "type": "SecureObject" }
+      },
+      "triggers": {
+        "When_a_project_is_created_or_updated": {
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "SubscribeWebhookTrigger"
+            },
+            "parameters": {
+              "subscriptionRequest/message": 4,
+              "subscriptionRequest/entityname": "contoso_project",
+              "subscriptionRequest/scope": 4,
+              "subscriptionRequest/filteringattributes": "contoso_status,contoso_budget",
+              "subscriptionRequest/filterexpression": "statecode eq 0",
+              "subscriptionRequest/runas": 1
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Get_owner": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "GetItem"
+            },
+            "parameters": {
+              "entityName": "systemusers",
+              "recordId": "@triggerOutputs()?['body/_ownerid_value']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Scope_Notify": {
+          "runAfter": { "Get_owner": ["Succeeded"] },
+          "type": "Scope",
+          "actions": {
+            "Condition_budget": {
+              "type": "If",
+              "expression": { "and": [{ "greater": ["@triggerOutputs()?['body/contoso_budget']", 100000] }] },
+              "actions": {
+                "Send_an_email": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                      "connectionName": "shared_office365",
+                      "operationId": "SendEmailV2"
+                    },
+                    "parameters": {
+                      "emailMessage/To": "@outputs('Get_owner')?['body/internalemailaddress']",
+                      "emailMessage/Subject": "Large project",
+                      "emailMessage/Body": "<p>Project @{triggerOutputs()?['body/contoso_name']}</p>"
+                    }
+                  }
+                },
+                "Update_project_flag": {
+                  "runAfter": { "Send_an_email": ["Succeeded"] },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "UpdateRecord"
+                    },
+                    "parameters": {
+                      "entityName": "contoso_projects",
+                      "recordId": "@triggerOutputs()?['body/contoso_projectid']",
+                      "item/contoso_flagged": true
+                    }
+                  }
+                }
+              },
+              "else": {
+                "actions": {
+                  "List_tasks": {
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": {
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                        "connectionName": "shared_commondataserviceforapps",
+                        "operationId": "ListRecords"
+                      },
+                      "parameters": {
+                        "entityName": "contoso_tasks",
+                        "$filter": "_contoso_projectid_value eq @{triggerOutputs()?['body/contoso_projectid']}"
+                      }
+                    }
+                  },
+                  "Apply_to_each_task": {
+                    "runAfter": { "List_tasks": ["Succeeded"] },
+                    "type": "Foreach",
+                    "foreach": "@outputs('List_tasks')?['body/value']",
+                    "actions": {
+                      "Delete_task": {
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                            "connectionName": "shared_commondataserviceforapps",
+                            "operationId": "DeleteRecord"
+                          },
+                          "parameters": {
+                            "entityName": "contoso_tasks",
+                            "recordId": "@items('Apply_to_each_task')?['contoso_taskid']"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Switch_status": {
+          "runAfter": { "Scope_Notify": ["Succeeded", "Failed"] },
+          "type": "Switch",
+          "expression": "@triggerOutputs()?['body/contoso_status']",
+          "cases": {
+            "Case_closed": {
+              "case": 3,
+              "actions": {
+                "Perform_close_action": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "PerformBoundAction"
+                    },
+                    "parameters": {
+                      "entityName": "contoso_projects",
+                      "actionName": "contoso_CloseProject",
+                      "recordId": "@triggerOutputs()?['body/contoso_projectid']"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "actions": {
+              "Do_until_synced": {
+                "type": "Until",
+                "expression": "@equals(variables('synced'), true)",
+                "limit": { "count": 5, "timeout": "PT1H" },
+                "actions": {
+                  "Create_account_note": {
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": {
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                        "connectionName": "shared_commondataserviceforapps",
+                        "operationId": "CreateRecord"
+                      },
+                      "parameters": {
+                        "entityName": "annotations",
+                        "item/subject": "Synced",
+                        "item/objectid_contoso_project@odata.bind": "contoso_projects(@{triggerOutputs()?['body/contoso_projectid']})"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

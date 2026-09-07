@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form showImage="true" maxWidth="1920" headerdensity="HighWithControls">
+  <ancestor id="{8448b78f-8f42-454e-8e2a-f8196b0419af}" />
+  <hiddencontrols>
+    <data id="statecode" datafieldname="statecode" classid="{3EF39988-22BB-4f0b-BBBE-64B5A3748AEE}" />
+  </hiddencontrols>
+  <formLibraries>
+    <Library name="contoso_/scripts/project.js" libraryUniqueId="{aa11aa11-0000-0000-0000-000000000001}" />
+    <Library name="contoso_/scripts/common.js" libraryUniqueId="{aa11aa11-0000-0000-0000-000000000002}" />
+  </formLibraries>
+  <events>
+    <event name="onload" application="false" active="false">
+      <Handlers>
+        <Handler functionName="Contoso.Project.Form.onLoad" libraryName="contoso_/scripts/project.js" handlerUniqueId="{bb22bb22-0000-0000-0000-000000000001}" enabled="true" parameters="" passExecutionContext="true" />
+        <Handler functionName="Contoso.Common.applyTheme" libraryName="contoso_/scripts/common.js" handlerUniqueId="{bb22bb22-0000-0000-0000-000000000002}" enabled="true" parameters="&quot;dark&quot;" passExecutionContext="false" />
+      </Handlers>
+    </event>
+    <event name="onsave" application="false" active="false">
+      <Handlers>
+        <Handler functionName="Contoso.Project.Form.onSave" libraryName="contoso_/scripts/project.js" handlerUniqueId="{bb22bb22-0000-0000-0000-000000000003}" enabled="true" parameters="" passExecutionContext="true" />
+      </Handlers>
+    </event>
+    <event name="onchange" application="false" active="false" attribute="contoso_status">
+      <Handlers>
+        <Handler functionName="Contoso.Project.Form.onStatusChange" libraryName="contoso_/scripts/project.js" handlerUniqueId="{bb22bb22-0000-0000-0000-000000000004}" enabled="true" parameters="" passExecutionContext="true" />
+      </Handlers>
+    </event>
+    <event name="onchange" application="false" active="false" attribute="contoso_budget">
+      <Handlers>
+        <Handler functionName="Contoso.Project.Form.onBudgetChange" libraryName="contoso_/scripts/project.js" handlerUniqueId="{bb22bb22-0000-0000-0000-000000000005}" enabled="false" parameters="" passExecutionContext="true" />
+      </Handlers>
+    </event>
+    <event name="tabstatechange" application="false" active="false" control="tab_details">
+      <Handlers>
+        <Handler functionName="Contoso.Project.Form.onTabChange" libraryName="contoso_/scripts/project.js" handlerUniqueId="{bb22bb22-0000-0000-0000-000000000006}" enabled="true" parameters="" passExecutionContext="true" />
+      </Handlers>
+    </event>
+    <event name="onrecordselect" application="false" active="false" control="Tasks">
+      <Handlers>
+        <Handler functionName="Contoso.Project.Form.onTaskSelected" libraryName="contoso_/scripts/project.js" handlerUniqueId="{bb22bb22-0000-0000-0000-000000000007}" enabled="true" parameters="" passExecutionContext="true" />
+      </Handlers>
+    </event>
+  </events>
+  <header id="{cc33cc33-0000-0000-0000-000000000001}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+    <rows>
+      <row>
+        <cell id="{cc33cc33-0000-0000-0000-000000000002}" showlabel="true" locklevel="0">
+          <labels><label description="Owner" languagecode="1033" /></labels>
+          <control id="header_ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" disabled="false" />
+        </cell>
+        <cell id="{cc33cc33-0000-0000-0000-000000000003}" showlabel="true" locklevel="0">
+          <labels><label description="Status" languagecode="1033" /></labels>
+          <control id="header_statuscode" classid="{3EF39988-22BB-4f0b-BBBE-64B5A3748AEE}" datafieldname="statuscode" disabled="false" />
+        </cell>
+      </row>
+    </rows>
+  </header>
+  <tabs>
+    <tab name="tab_general" id="{dd44dd44-0000-0000-0000-000000000001}" IsUserDefined="0" locklevel="0" showlabel="true" expanded="true">
+      <labels><label description="General" languagecode="1033" /></labels>
+      <columns>
+        <column width="50%">
+          <sections>
+            <section name="section_general" showlabel="false" showbar="false" locklevel="0" id="{dd44dd44-0000-0000-0000-000000000002}" IsUserDefined="0" layout="varwidth" columns="1" labelwidth="115" celllabelalignment="Left" celllabelposition="Left">
+              <labels><label description="General" languagecode="1033" /></labels>
+              <rows>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000003}" showlabel="true" locklevel="0">
+                    <labels><label description="Name" languagecode="1033" /></labels>
+                    <control id="contoso_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="contoso_name" disabled="false" />
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000004}" showlabel="true" locklevel="0">
+                    <labels><label description="Status" languagecode="1033" /></labels>
+                    <control id="contoso_status" classid="{3EF39988-22BB-4f0b-BBBE-64B5A3748AEE}" datafieldname="contoso_status" disabled="false" uniqueid="{ee55ee55-0000-0000-0000-000000000001}" />
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000005}" showlabel="true" locklevel="0">
+                    <labels><label description="Budget" languagecode="1033" /></labels>
+                    <control id="contoso_budget" classid="{533B9E00-756B-4312-95A0-DC888637AC78}" datafieldname="contoso_budget" disabled="false" uniqueid="{ee55ee55-0000-0000-0000-000000000002}" />
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000006}" showlabel="true" locklevel="0">
+                    <labels><label description="Progress" languagecode="1033" /></labels>
+                    <control id="contoso_progress" classid="{C6D124CA-7EDA-4a60-AEA9-7FB8D318B68F}" datafieldname="contoso_progress" disabled="false" uniqueid="{ee55ee55-0000-0000-0000-000000000003}" />
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000007}" showlabel="true" locklevel="0">
+                    <labels><label description="Customer" languagecode="1033" /></labels>
+                    <control id="contoso_customerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="contoso_customerid" disabled="true" />
+                  </cell>
+                </row>
+              </rows>
+            </section>
+          </sections>
+        </column>
+        <column width="50%">
+          <sections>
+            <section name="section_customer" showlabel="true" showbar="false" locklevel="0" id="{dd44dd44-0000-0000-0000-000000000008}" IsUserDefined="0" layout="varwidth" columns="1" labelwidth="115" celllabelalignment="Left" celllabelposition="Left">
+              <labels><label description="Customer details" languagecode="1033" /></labels>
+              <rows>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000009}" showlabel="false" locklevel="0" rowspan="4" colspan="1" auto="false">
+                    <labels><label description="Customer card" languagecode="1033" /></labels>
+                    <control id="QuickViewCustomer" classid="{5C5600E0-1D6E-4205-A272-BE80DA87FD42}" disabled="false">
+                      <parameters>
+                        <QuickForms><QuickFormIds><QuickFormId entityname="account">{ff66ff66-0000-0000-0000-000000000001}</QuickFormId></QuickFormIds></QuickForms>
+                        <QuickFormsRelationshipName>contoso_customerid</QuickFormsRelationshipName>
+                      </parameters>
+                    </control>
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000010}" showlabel="true" locklevel="0" rowspan="6" colspan="1" auto="false">
+                    <labels><label description="Site" languagecode="1033" /></labels>
+                    <control id="WebResource_SiteMap" classid="{9FDF5F91-88B1-47f4-AD53-C11EFC01A01D}" disabled="false">
+                      <parameters>
+                        <Url>contoso_/pages/sitemap.html</Url>
+                        <PassParameters>true</PassParameters>
+                        <Security>false</Security>
+                        <Scrolling>auto</Scrolling>
+                        <Border>false</Border>
+                      </parameters>
+                    </control>
+                  </cell>
+                </row>
+              </rows>
+            </section>
+          </sections>
+        </column>
+      </columns>
+    </tab>
+    <tab name="tab_details" id="{dd44dd44-0000-0000-0000-000000000011}" IsUserDefined="0" locklevel="0" showlabel="true" expanded="false">
+      <labels><label description="Details" languagecode="1033" /></labels>
+      <columns>
+        <column width="100%">
+          <sections>
+            <section name="section_tasks" showlabel="true" showbar="false" locklevel="0" id="{dd44dd44-0000-0000-0000-000000000012}" IsUserDefined="0" layout="varwidth" columns="1" labelwidth="115" celllabelalignment="Left" celllabelposition="Left">
+              <labels><label description="Tasks" languagecode="1033" /></labels>
+              <rows>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000013}" showlabel="true" locklevel="0" rowspan="8" colspan="1" auto="false">
+                    <labels><label description="Tasks" languagecode="1033" /></labels>
+                    <control id="Tasks" classid="{E7A81278-8635-4d9e-8D4D-59480B391C5B}" disabled="false" indicationOfSubgrid="true" uniqueid="{ee55ee55-0000-0000-0000-000000000004}">
+                      <parameters>
+                        <ViewId>{11111111-1111-1111-1111-111111111111}</ViewId>
+                        <IsUserView>false</IsUserView>
+                        <RelationshipName>contoso_project_task</RelationshipName>
+                        <TargetEntityType>contoso_task</TargetEntityType>
+                        <AutoExpand>Fixed</AutoExpand>
+                        <EnableQuickFind>false</EnableQuickFind>
+                        <EnableViewPicker>false</EnableViewPicker>
+                        <ViewIds>{11111111-1111-1111-1111-111111111111}</ViewIds>
+                        <EnableJumpBar>false</EnableJumpBar>
+                        <ChartGridMode>Grid</ChartGridMode>
+                        <VisualizationId />
+                        <IsUserChart>false</IsUserChart>
+                        <EnableChartPicker>false</EnableChartPicker>
+                        <RecordsPerPage>4</RecordsPerPage>
+                        <HeaderColorCode>#F3F3F3</HeaderColorCode>
+                      </parameters>
+                    </control>
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000014}" showlabel="true" locklevel="0" rowspan="6" colspan="1" auto="false">
+                    <labels><label description="Portal" languagecode="1033" /></labels>
+                    <control id="IFRAME_Portal" classid="{FD2A7985-3187-444e-908D-6624B21F69C0}" disabled="false">
+                      <parameters>
+                        <Url>https://portal.contoso.example/embed?token=SECRET123&amp;project={id}</Url>
+                        <PassParameters>true</PassParameters>
+                        <Security>true</Security>
+                        <Scrolling>auto</Scrolling>
+                        <Border>true</Border>
+                        <ShowOnMobile>false</ShowOnMobile>
+                      </parameters>
+                    </control>
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000015}" showlabel="true" locklevel="0">
+                    <labels><label description="Notes" languagecode="1033" /></labels>
+                    <control id="notescontrol" classid="{06375649-C143-495e-A496-C962E5B4488E}" disabled="false" />
+                  </cell>
+                </row>
+                <row>
+                  <cell id="{dd44dd44-0000-0000-0000-000000000016}" showlabel="true" locklevel="0">
+                    <labels><label description="Mystery" languagecode="1033" /></labels>
+                    <control id="mystery_control" classid="{00000000-0000-0000-0000-00000000ABCD}" disabled="false">
+                      <parameters><Custom>x</Custom></parameters>
+                    </control>
+                  </cell>
+                </row>
+              </rows>
+            </section>
+          </sections>
+        </column>
+      </columns>
+    </tab>
+  </tabs>
+  <controlDescriptions>
+    <controlDescription forControl="{ee55ee55-0000-0000-0000-000000000003}">
+      <customControl formFactor="2" name="Contoso.Controls.ProgressBar">
+        <parameters>
+          <value type="Whole.None">contoso_progress</value>
+          <max static="true" type="Whole.None">100</max>
+        </parameters>
+      </customControl>
+      <customControl formFactor="0" name="Contoso.Controls.ProgressBar">
+        <parameters>
+          <value type="Whole.None">contoso_progress</value>
+        </parameters>
+      </customControl>
+    </controlDescription>
+    <controlDescription forControl="{ee55ee55-0000-0000-0000-000000000002}">
+      <customControl formFactor="2" name="MscrmControls.FieldControls.CurrencyControl">
+        <parameters>
+          <value type="Currency">contoso_budget</value>
+        </parameters>
+      </customControl>
+    </controlDescription>
+    <controlDescription forControl="{ee55ee55-0000-0000-0000-000000000004}">
+      <customControl formFactor="2" name="MscrmControls.Grid.PCFGridControl">
+        <parameters>
+          <TargetEntityType static="true" type="SingleLine.Text">contoso_task</TargetEntityType>
+        </parameters>
+      </customControl>
+    </controlDescription>
+  </controlDescriptions>
+  <DisplayConditions Order="0" FallbackForm="true">
+    <Everyone />
+  </DisplayConditions>
+</form>

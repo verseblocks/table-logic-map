@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Activity x:Class="XrmWorkflowbr1a2b3c4d5e6f708192a3b4c5d6e7f809" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mcwb="clr-namespace:Microsoft.Crm.Workflow.BusinessRules;assembly=Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:mxs="clr-namespace:Microsoft.Xrm.Sdk;assembly=Microsoft.Xrm.Sdk, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:mxswa="clr-namespace:Microsoft.Xrm.Sdk.Workflow.Activities;assembly=Microsoft.Xrm.Sdk.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:s="clr-namespace:System;assembly=mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" xmlns:this="clr-namespace:" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="InputEntities" Type="InArgument(scg:IDictionary(x:String, mxs:Entity))" />
+    <x:Property Name="CreatedEntities" Type="InArgument(scg:IDictionary(x:String, mxs:Entity))" />
+  </x:Members>
+  <mva:VisualBasic.Settings>Assembly references and imported namespaces for internal implementation</mva:VisualBasic.Settings>
+  <mxswa:Workflow>
+    <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionStep1: If Status equals Active">
+      <mxswa:ActivityReference.Properties>
+        <sco:Collection x:TypeArguments="Variable" x:Key="Variables">
+          <Variable x:TypeArguments="x:Object" Name="ConditionStep1_1" />
+          <Variable x:TypeArguments="x:Object" Name="ConditionStep1_2" />
+        </sco:Collection>
+        <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+          <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.ConditionSequence, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionStep1">
+            <mxswa:ActivityReference.Properties>
+              <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+              <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.ConditionBranch, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionBranchStep2">
+                  <mxswa:ActivityReference.Properties>
+                    <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                    <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.Condition, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionStep3">
+                        <mxswa:ActivityReference.Arguments>
+                          <InArgument x:TypeArguments="x:Boolean" x:Key="Wait">False</InArgument>
+                          <InArgument x:TypeArguments="x:String" x:Key="Condition">[ConditionStep1_1]</InArgument>
+                        </mxswa:ActivityReference.Arguments>
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:GetEntityProperty Attribute="contoso_status" Entity="[InputEntities(&quot;primaryEntity&quot;)]" EntityName="contoso_project" Value="[ConditionStep1_2]">
+                              <mxswa:GetEntityProperty.TargetType>
+                                <InArgument x:TypeArguments="s:Type">
+                                  <mxswa:ReferenceLiteral x:TypeArguments="s:Type" Value="mxs:OptionSetValue" />
+                                </InArgument>
+                              </mxswa:GetEntityProperty.TargetType>
+                            </mxswa:GetEntityProperty>
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.EvaluateExpression, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="EvaluateExpression">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="ExpressionOperator">Equal</InArgument>
+                                <InArgument x:TypeArguments="s:Object[]" x:Key="Parameters">[New Object() { ConditionStep1_2, Microsoft.Xrm.Sdk.Workflow.WorkflowPropertyType.OptionSetValue, "1" }]</InArgument>
+                                <InArgument x:TypeArguments="s:Type" x:Key="TargetType">[GetType(Boolean)]</InArgument>
+                                <OutArgument x:TypeArguments="x:Object" x:Key="Result">[ConditionStep1_1]</OutArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetVisibilityStep4: Show region">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.BusinessRules.SetVisibility, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetVisibilityStep4">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="Attribute">contoso_region</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="x:Boolean" x:Key="Visibility">True</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetRequiredLevelStep5: Region required">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.BusinessRules.SetRequiredLevel, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetRequiredLevelStep5">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="Attribute">contoso_region</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="RequiredLevel">Required</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetDefaultValueStep6: Default region">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.BusinessRules.SetDefaultValue, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetDefaultValueStep6">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="Attribute">contoso_region</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="x:Object" x:Key="Value">[New OptionSetValue(100000001)]</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="LockUnlockStep7: Lock budget">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.BusinessRules.LockUnlock, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="LockUnlockStep7">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="Attribute">contoso_budget</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="x:Boolean" x:Key="Lock">True</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                    </sco:Collection>
+                  </mxswa:ActivityReference.Properties>
+                </mxswa:ActivityReference>
+                <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.ConditionBranch, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionBranchStep8: Else">
+                  <mxswa:ActivityReference.Properties>
+                    <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                    <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ShowErrorMessageStep9: Inactive projects cannot change budget">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.BusinessRules.ShowErrorMessage, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ShowErrorMessageStep9">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="Attribute">contoso_budget</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="ErrorMessage">Inactive projects cannot change budget</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetValueStep10: Clear progress">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.BusinessRules.SetValue, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetValueStep10">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="Attribute">contoso_progress</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="x:Object" x:Key="Value">[0]</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                    </sco:Collection>
+                  </mxswa:ActivityReference.Properties>
+                </mxswa:ActivityReference>
+              </sco:Collection>
+            </mxswa:ActivityReference.Properties>
+          </mxswa:ActivityReference>
+        </sco:Collection>
+      </mxswa:ActivityReference.Properties>
+    </mxswa:ActivityReference>
+  </mxswa:Workflow>
+</Activity>

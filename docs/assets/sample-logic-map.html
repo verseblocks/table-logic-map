@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Table Logic Map — Project (contoso_project) — Contoso DEV</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f7f7f8; color: #16181d; font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 14px; line-height: 1.5; }
+main { max-width: 960px; margin: 0 auto; padding: 24px 28px 64px; background: #ffffff; }
+h1 { font-size: 24px; margin: 0 0 8px; }
+h2 { font-size: 19px; margin: 30px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #d6d8dd; }
+h3 { font-size: 16px; margin: 20px 0 6px; }
+h4 { font-size: 14px; margin: 14px 0 4px; }
+p { margin: 6px 0; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+code { font-family: Consolas, "Courier New", monospace; font-size: 12px; }
+.meta { color: #4a4f57; }
+.none { color: #6b7078; font-style: italic; }
+.off { color: #8a3d3d; }
+.note, .explain { color: #6b7078; font-size: 12px; }
+.count { color: #6b7078; font-weight: normal; font-size: 13px; }
+.name { font-weight: 600; }
+.toc { margin: 20px 0; padding: 4px 18px 12px; border: 1px solid #d6d8dd; background: #fafafb; }
+.toc h2 { border-bottom: 0; margin: 12px 0 4px; font-size: 16px; }
+.toc a { color: #1a4f9c; }
+ul.legend { list-style: none; padding-left: 0; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 12px; font-size: 12px; }
+th, td { border: 1px solid #b9bcc3; padding: 4px 7px; text-align: left; vertical-align: top; }
+th { background: #eef0f3; font-weight: 600; }
+.badge { display: inline-block; border: 1px solid #9aa0a8; border-radius: 3px; padding: 0 5px; font-size: 11px; background: #f2f3f5; }
+.badge-sync, .badge-realtime { border-color: #a86b2d; background: #fbf1e4; }
+.badge-async, .badge-background { border-color: #4a7ba8; background: #eaf1f8; }
+figure.diagram { margin: 10px 0 16px; overflow-x: auto; page-break-inside: avoid; }
+/* The figure is 820px wide, the printed column (A4/Letter less the 16mm @page margin) is
+   about 675px: without this the right end of every row — the kind/mode tail, and the tail of
+   a long name — would be clipped off the paper. viewBox + height:auto scale it down whole. */
+figure.diagram svg { max-width: 100%; height: auto; }
+figcaption { color: #6b7078; font-size: 12px; margin-top: 4px; }
+@media print {
+  @page { margin: 16mm; }
+  body { background: #ffffff; color: #000000; font-size: 11pt; }
+  main { max-width: none; padding: 0; background: #ffffff; }
+  h1, h2, h3, h4 { color: #000000; page-break-after: avoid; break-after: avoid; }
+  h2, h3 { page-break-inside: avoid; }
+  table, figure.diagram, li { page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  th { background: #eeeeee; }
+  .toc { border-color: #000000; background: transparent; }
+  a { color: #000000; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Table Logic Map — Project (contoso_project)</h1>
+<p class="meta">Environment: Contoso DEV (https://contoso-dev.crm.dynamics.com) · Generated: 2026-03-01T10:00:00.000Z</p>
+<p class="meta">Custom · User-owned · Audit on · Duplicate detection off · Change tracking on · Activities on · Notes on</p>
+<p class="meta">3 plugin steps · 2 workflows (1 real-time / 1 background) · 2 flows · 1 business rule · 2 forms (2 handlers, 1 PCF, 1 component) · 1 key · 1 duplicate rule · 2 cascades · 1 field security profile · 1 autonumber column · 1 computed column · 2 external touchers · 2 apps · 6 views (1 quick find)</p>
+<nav class="toc">
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#smells">Smells (3)</a></li>
+<li><a href="#pipeline">Pipeline (8)</a></li>
+<li><a href="#forms">Forms (2)</a></li>
+<li><a href="#columns">Columns (10)</a></li>
+<li><a href="#data-rules">Data rules</a></li>
+<li><a href="#touched-by">Touched by (2)</a></li>
+<li><a href="#apps">Apps (2)</a></li>
+<li><a href="#other-dependencies">Other dependencies (1)</a></li>
+<li><a href="#source-errors">Source errors (1)</a></li>
+</ul>
+</nav>
+<h2 id="legend">Legend</h2>
+<ul class="legend">
+<li><span class="badge badge-sync">sync</span> runs inside the database transaction and can block the save</li>
+<li><span class="badge badge-async">async</span> queued by the async service, runs after the transaction commits</li>
+<li><span class="badge badge-realtime">real-time</span> real-time workflow — inside the transaction, like a sync plugin</li>
+<li><span class="badge badge-background">background</span> background workflow — queued, runs after the transaction commits</li>
+<li><span class="badge badge-client">client</span> runs in the browser on the form, before the save reaches the server</li>
+<li><span class="badge badge-instant">instant</span> run on demand by a user, not by a table event</li>
+<li><span class="badge badge-rule">rule</span> platform data rule, enforced whenever the data changes</li>
+</ul>
+<section>
+<h2 id="smells">Smells <span class="count">(3)</span></h2>
+<ul>
+<li><strong>info</strong> <code>cascade-chain</code> — Cascade delete chain: contoso_project → contoso_task continues 2 levels deep<br /><span class="explain">Cascade delete removes child rows inside the same transaction, and each level fires the children&#39;s own delete logic (plugins, workflows, flows, further cascades). Chains of two or more levels make a single delete expensive, hard to predict and impossible to undo; consider Restrict or RemoveLink on one of the levels.</span></li>
+<li><strong>info</strong> <code>disabled-clutter</code> — Contoso.Plugins.ProjectAuditTrail: Update of contoso_project is disabled<br /><span class="explain">Disabled steps, draft processes and disabled handlers do not run but still show up in solutions, exports and the maker portal. They mislead readers about what the table does; remove them or document why they are kept.</span></li>
+<li><strong>info</strong> <code>realtime-plus-plugin</code> — Real-time workflow and sync plugin both on Update / Post-operation (sync)<br /><span class="explain">Dataverse runs real-time workflows as sync steps interleaved with plugins by execution order (rank 1 unless changed). When both exist on the same message and stage the effective order depends on ranks that are set in two different designers, so it is easy to break. Prefer one mechanism per message/stage or make the ranks explicit.</span></li>
+</ul>
+</section>
+<section>
+<h2 id="pipeline">Pipeline <span class="count">(8)</span></h2>
+<h3 id="pipeline-create">Create</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="374" viewBox="0 0 820 374" role="img"><title>Execution pipeline for Create on Project (contoso_project)</title><desc>6 items in 3 stages, in execution order: Pre-operation 3, After commit (async) 2, Always (data rule) 1. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="374" fill="#ffffff"/><g data-stage="preoperation"><rect x="14" y="14" width="792" height="112" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Pre-operation (3)</text><g id="pipeline-create-n1"><title>Contoso.Plugins.ProjectNumbering: Create of contoso_project — plugin · rank 1 · sync</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#bed6ef" fill-opacity="1"/><text x="63" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">#1</text><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">sync · plugin</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Contoso.Plugins.ProjectNumbering: Create of contoso_project</text></g><g id="pipeline-create-n2"><title>Project code — autonumber · rule</title><rect x="22" y="70" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="71" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · autonumber</text><text x="71" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Project code</text></g><g id="pipeline-create-n3"><title>Projects with the same name — duplicate rule · sync</title><rect x="22" y="96" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="97" width="10" height="20" fill="#bed6ef" fill-opacity="1"/><text x="791" y="111" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">sync · duplicate rule</text><text x="71" y="111" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Projects with the same name</text></g></g><g data-stage="postcommit"><rect x="14" y="152" width="792" height="86" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="153" width="790" height="21" fill="#eceff3"/><line x1="14" y1="174" x2="806" y2="174" stroke="#8d97a1" stroke-width="1"/><text x="22" y="167" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">After commit (async) (2)</text><g id="pipeline-create-n4"><title>Create kickoff tasks — workflow · background · inferred</title><rect x="22" y="182" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><rect x="23" y="183" width="10" height="20" fill="#60a985" fill-opacity="1"/><text x="791" y="197" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">background · workflow</text><text x="71" y="197" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">≈ Create kickoff tasks</text></g><g id="pipeline-create-n5"><title>Notify PM &quot;on create&quot; [v2] — flow · async</title><rect x="22" y="208" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="209" width="10" height="20" fill="#edb482" fill-opacity="1"/><text x="791" y="223" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">async · flow</text><text x="71" y="223" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Notify PM &quot;on create&quot; [v2]</text></g></g><g data-stage="always"><rect x="14" y="264" width="792" height="60" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="265" width="790" height="21" fill="#eceff3"/><line x1="14" y1="286" x2="806" y2="286" stroke="#8d97a1" stroke-width="1"/><text x="22" y="279" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Always (data rule) (1)</text><g id="pipeline-create-n6"><title>Project code — key · rule</title><rect x="22" y="294" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="295" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="309" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · key</text><text x="71" y="309" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Project code</text></g></g><line x1="410" y1="129" x2="410" y2="144" stroke="#6b7480" stroke-width="1.5"/><path d="M 410 150 L 406 144 L 414 144 Z" fill="#6b7480"/><rect x="14" y="342" width="12" height="12" rx="2" fill="#f4e8c2" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="352" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">rule</text><rect x="130" y="342" width="12" height="12" rx="2" fill="#bed6ef" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="148" y="352" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">sync</text><rect x="246" y="342" width="12" height="12" rx="2" fill="#edb482" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="264" y="352" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">async</text><rect x="362" y="342" width="12" height="12" rx="2" fill="#60a985" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="380" y="352" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">background</text><rect x="478" y="342" width="12" height="12" rx="2" fill="#ffffff" fill-opacity="1" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><text x="496" y="352" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">≈ inferred</text></svg>
+<figcaption>Execution order for Create</figcaption>
+</figure>
+<h4>Pre-operation</h4>
+<ul>
+<li><strong>#1</strong> <span class="name">Contoso.Plugins.ProjectNumbering: Create of contoso_project</span> — plugin step · <span class="badge badge-sync">sync</span> · enabled · assembly: Contoso.Plugins · version: 1.4.0.0 · type: Contoso.Plugins.ProjectNumbering · images: PreImage (Pre: contoso_code, contoso_name) · secure config: set (never exported) · config: [configuration omitted] · touches: contoso_code</li>
+<li><span class="name">Project code</span> — autonumber · <span class="badge badge-rule">rule</span> · enabled · format: PRJ-{SEQNUM:5} · touches: contoso_code</li>
+<li><span class="name">Projects with the same name</span> — duplicate rule · <span class="badge badge-sync">sync</span> · enabled · matching table: contoso_project · status: Published · touches: contoso_name</li>
+</ul>
+<h4>After commit (async) <span class="note">(After commit — order not guaranteed)</span></h4>
+<ul>
+<li><span class="name">Create kickoff tasks</span> — workflow · <span class="badge badge-background">background</span> · enabled · scope: Organization · on demand · touches: contoso_accountid, contoso_name · confidence: heuristic</li>
+<li><span class="name">Notify PM &quot;on create&quot; [v2]</span> — cloud flow · <span class="badge badge-async">async</span> · enabled · scope: Organization · run as: Flow owner</li>
+</ul>
+<h4>Always (data rule)</h4>
+<ul>
+<li><span class="name">Project code</span> — alternate key · <span class="badge badge-rule">rule</span> · enabled · columns: contoso_code · status: Active · touches: contoso_code</li>
+</ul>
+<h3 id="pipeline-update">Update</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="434" viewBox="0 0 820 434" role="img"><title>Execution pipeline for Update on Project (contoso_project)</title><desc>6 items in 4 stages, in execution order: Pre-operation 1, Post-operation (sync) 2, After commit (async) 2, Always (data rule) 1. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="434" fill="#ffffff"/><g data-stage="preoperation"><rect x="14" y="14" width="792" height="60" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Pre-operation (1)</text><g id="pipeline-update-n1"><title>Projects with the same name — duplicate rule · sync</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#bed6ef" fill-opacity="1"/><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">sync · duplicate rule</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Projects with the same name</text></g></g><g data-stage="postoperation"><rect x="14" y="100" width="792" height="86" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="101" width="790" height="21" fill="#eceff3"/><line x1="14" y1="122" x2="806" y2="122" stroke="#8d97a1" stroke-width="1"/><text x="22" y="115" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Post-operation (sync) (2)</text><g id="pipeline-update-n2"><title>Contoso.Plugins.ProjectRollup: Update of contoso_project — plugin · rank 1 · sync</title><rect x="22" y="130" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="131" width="10" height="20" fill="#bed6ef" fill-opacity="1"/><text x="63" y="145" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">#1</text><text x="791" y="145" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">sync · plugin</text><text x="71" y="145" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Contoso.Plugins.ProjectRollup: Update of contoso_project</text></g><g id="pipeline-update-n3"><title>Validate budget — workflow · real-time · inferred</title><rect x="22" y="156" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><rect x="23" y="157" width="10" height="20" fill="#79b8d8" fill-opacity="1"/><text x="791" y="171" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">real-time · workflow</text><text x="71" y="171" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">≈ Validate budget</text></g></g><g data-stage="postcommit"><rect x="14" y="212" width="792" height="86" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="213" width="790" height="21" fill="#eceff3"/><line x1="14" y1="234" x2="806" y2="234" stroke="#8d97a1" stroke-width="1"/><text x="22" y="227" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">After commit (async) (2)</text><g id="pipeline-update-n4"><title>Contoso.Plugins.ProjectAuditTrail: Update of contoso_project — plugin · rank 2 · async · disabled</title><rect x="22" y="242" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1" stroke-dasharray="5 3"/><rect x="23" y="243" width="10" height="20" fill="#edb482" fill-opacity="0.4"/><text x="63" y="257" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">#2</text><text x="791" y="257" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">off · async · plugin</text><text x="71" y="257" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#5c636b">Contoso.Plugins.ProjectAuditTrail: Update of contoso_project</text></g><g id="pipeline-update-n5"><title>Sync budget to finance — flow · async</title><rect x="22" y="268" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="269" width="10" height="20" fill="#edb482" fill-opacity="1"/><text x="791" y="283" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">async · flow</text><text x="71" y="283" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Sync budget to finance</text></g></g><g data-stage="always"><rect x="14" y="324" width="792" height="60" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="325" width="790" height="21" fill="#eceff3"/><line x1="14" y1="346" x2="806" y2="346" stroke="#8d97a1" stroke-width="1"/><text x="22" y="339" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Always (data rule) (1)</text><g id="pipeline-update-n6"><title>Project code — key · rule</title><rect x="22" y="354" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="355" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="369" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · key</text><text x="71" y="369" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Project code</text></g></g><line x1="410" y1="77" x2="410" y2="92" stroke="#6b7480" stroke-width="1.5"/><path d="M 410 98 L 406 92 L 414 92 Z" fill="#6b7480"/><line x1="410" y1="189" x2="410" y2="204" stroke="#6b7480" stroke-width="1.5"/><path d="M 410 210 L 406 204 L 414 204 Z" fill="#6b7480"/><rect x="14" y="402" width="12" height="12" rx="2" fill="#f4e8c2" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="412" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">rule</text><rect x="130" y="402" width="12" height="12" rx="2" fill="#bed6ef" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="148" y="412" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">sync</text><rect x="246" y="402" width="12" height="12" rx="2" fill="#edb482" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="264" y="412" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">async</text><rect x="362" y="402" width="12" height="12" rx="2" fill="#79b8d8" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="380" y="412" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">real-time</text><rect x="478" y="402" width="12" height="12" rx="2" fill="#ffffff" fill-opacity="0.4" stroke="#4a5560" stroke-width="1" stroke-dasharray="5 3"/><text x="496" y="412" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">off = disabled</text><rect x="594" y="402" width="12" height="12" rx="2" fill="#ffffff" fill-opacity="1" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><text x="612" y="412" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">≈ inferred</text></svg>
+<figcaption>Execution order for Update</figcaption>
+</figure>
+<h4>Pre-operation</h4>
+<ul>
+<li><span class="name">Projects with the same name</span> — duplicate rule · <span class="badge badge-sync">sync</span> · enabled · matching table: contoso_project · status: Published · touches: contoso_name</li>
+</ul>
+<h4>Post-operation (sync) <span class="note">(Same rank — order between plugins and real-time workflows is not guaranteed)</span></h4>
+<ul>
+<li><strong>#1</strong> <span class="name">Contoso.Plugins.ProjectRollup: Update of contoso_project</span> — plugin step · <span class="badge badge-sync">sync</span> · enabled · filtering: contoso_budget, contoso_status · assembly: Contoso.Plugins · version: 1.4.0.0 · type: Contoso.Plugins.ProjectRollup · images: PostImage (Post: contoso_budget); PreImage (Pre: all columns) · touches: contoso_margin · smells: realtime-plus-plugin</li>
+<li><span class="name">Validate budget</span> — workflow · <span class="badge badge-realtime">real-time</span> · enabled · filtering: contoso_budget · scope: Organization · touches: contoso_budget, contoso_margin · confidence: heuristic · smells: realtime-plus-plugin</li>
+</ul>
+<h4>After commit (async) <span class="note">(After commit — order not guaranteed)</span></h4>
+<ul>
+<li><strong>#2</strong> <span class="name">Contoso.Plugins.ProjectAuditTrail: Update of contoso_project</span> — plugin step · <span class="badge badge-async">async</span> · <span class="off">disabled</span> · filtering: any column · assembly: Contoso.Plugins · version: 1.2.0.0 · type: Contoso.Plugins.ProjectAuditTrail · images: PreImage (Pre: all columns) · smells: disabled-clutter</li>
+<li><span class="name">Sync budget to finance</span> — cloud flow · <span class="badge badge-async">async</span> · enabled · filtering: contoso_budget, contoso_margin · scope: Organization · filter: statecode eq 0 · run as: Flow owner</li>
+</ul>
+<h4>Always (data rule)</h4>
+<ul>
+<li><span class="name">Project code</span> — alternate key · <span class="badge badge-rule">rule</span> · enabled · columns: contoso_code · status: Active · touches: contoso_code</li>
+</ul>
+<h3 id="pipeline-delete">Delete</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="124" viewBox="0 0 820 124" role="img"><title>Execution pipeline for Delete on Project (contoso_project)</title><desc>1 items in 1 stages, in execution order: Always (data rule) 1. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="124" fill="#ffffff"/><g data-stage="always"><rect x="14" y="14" width="792" height="60" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Always (data rule) (1)</text><g id="pipeline-delete-n1"><title>Delete → Cascade to contoso_task — cascade · rule</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · cascade</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Delete → Cascade to contoso_task</text></g></g><rect x="14" y="92" width="12" height="12" rx="2" fill="#f4e8c2" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="102" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">rule</text></svg>
+<figcaption>Execution order for Delete</figcaption>
+</figure>
+<h4>Always (data rule)</h4>
+<ul>
+<li><span class="name">Delete → Cascade to contoso_task</span> — cascade · <span class="badge badge-rule">rule</span> · enabled · child: contoso_task · via: contoso_projectid · behaviour: Cascade · relationship: contoso_project_tasks · smells: cascade-chain</li>
+</ul>
+<h3 id="pipeline-assign">Assign</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="124" viewBox="0 0 820 124" role="img"><title>Execution pipeline for Assign on Project (contoso_project)</title><desc>1 items in 1 stages, in execution order: Always (data rule) 1. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="124" fill="#ffffff"/><g data-stage="always"><rect x="14" y="14" width="792" height="60" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Always (data rule) (1)</text><g id="pipeline-assign-n1"><title>Assign → Cascade to contoso_task — cascade · rule</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · cascade</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Assign → Cascade to contoso_task</text></g></g><rect x="14" y="92" width="12" height="12" rx="2" fill="#f4e8c2" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="102" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">rule</text></svg>
+<figcaption>Execution order for Assign</figcaption>
+</figure>
+<h4>Always (data rule)</h4>
+<ul>
+<li><span class="name">Assign → Cascade to contoso_task</span> — cascade · <span class="badge badge-rule">rule</span> · enabled · child: contoso_task · via: contoso_projectid · behaviour: Cascade · relationship: contoso_project_tasks</li>
+</ul>
+<h3 id="pipeline-formload">FormLoad</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="202" viewBox="0 0 820 202" role="img"><title>Execution pipeline for FormLoad on Project (contoso_project)</title><desc>4 items in 1 stages, in execution order: Client (form) 4. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="202" fill="#ffffff"/><g data-stage="client"><rect x="14" y="14" width="792" height="138" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Client (form) (4)</text><g id="pipeline-formload-n1"><title>Contoso.Controls.BudgetGauge — PCF · client</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#f2f4f7" fill-opacity="1"/><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">client · PCF</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Contoso.Controls.BudgetGauge</text></g><g id="pipeline-formload-n2"><title>Contoso.Project.onLoad — script · client</title><rect x="22" y="70" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="71" width="10" height="20" fill="#f2f4f7" fill-opacity="1"/><text x="791" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">client · script</text><text x="71" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Contoso.Project.onLoad</text></g><g id="pipeline-formload-n3"><title>Default region — business rule · rule · inferred</title><rect x="22" y="96" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><rect x="23" y="97" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="111" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · business rule</text><text x="71" y="111" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">≈ Default region</text></g><g id="pipeline-formload-n4"><title>IFrame: IFRAME_Portal — component · client</title><rect x="22" y="122" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="123" width="10" height="20" fill="#f2f4f7" fill-opacity="1"/><text x="791" y="137" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">client · component</text><text x="71" y="137" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">IFrame: IFRAME_Portal</text></g></g><rect x="14" y="170" width="12" height="12" rx="2" fill="#f2f4f7" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="180" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">client</text><rect x="130" y="170" width="12" height="12" rx="2" fill="#f4e8c2" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="148" y="180" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">rule</text><rect x="246" y="170" width="12" height="12" rx="2" fill="#ffffff" fill-opacity="1" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><text x="264" y="180" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">≈ inferred</text></svg>
+<figcaption>Execution order for FormLoad</figcaption>
+</figure>
+<h4>Client (form)</h4>
+<ul>
+<li><span class="name">Contoso.Controls.BudgetGauge</span> — PCF control · <span class="badge badge-client">client</span> · enabled · form: Project · column: contoso_budget · tab: General · section: Financials · touches: contoso_budget</li>
+<li><span class="name">Contoso.Project.onLoad</span> — form script · <span class="badge badge-client">client</span> · enabled · form: Project · library: contoso_/scripts/project.js · function: Contoso.Project.onLoad · form event: onload</li>
+<li><span class="name">Default region</span> — business rule · <span class="badge badge-rule">rule</span> · enabled · form: Project · scope: Form · actions: SetDefaultValue, SetVisibility · touches: contoso_region · confidence: heuristic</li>
+<li><span class="name">IFrame: IFRAME_Portal</span> — form component · <span class="badge badge-client">client</span> · enabled · form: Project · type: IFrame · url: https://portal.contoso.com/projects?… · tab: Portal · section: Portal</li>
+</ul>
+<h3 id="pipeline-formsave">FormSave</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="124" viewBox="0 0 820 124" role="img"><title>Execution pipeline for FormSave on Project (contoso_project)</title><desc>1 items in 1 stages, in execution order: Client (form) 1. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="124" fill="#ffffff"/><g data-stage="client"><rect x="14" y="14" width="792" height="60" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Client (form) (1)</text><g id="pipeline-formsave-n1"><title>Name — required · client</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#f2f4f7" fill-opacity="1"/><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">client · required</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Name</text></g></g><rect x="14" y="92" width="12" height="12" rx="2" fill="#f2f4f7" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="102" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">client</text></svg>
+<figcaption>Execution order for FormSave</figcaption>
+</figure>
+<h4>Client (form)</h4>
+<ul>
+<li><span class="name">Name</span> — required column · <span class="badge badge-client">client</span> · enabled · level: ApplicationRequired · touches: contoso_name</li>
+</ul>
+<h3 id="pipeline-fieldchange">FieldChange</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="150" viewBox="0 0 820 150" role="img"><title>Execution pipeline for FieldChange on Project (contoso_project)</title><desc>2 items in 1 stages, in execution order: Client (form) 2. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="150" fill="#ffffff"/><g data-stage="client"><rect x="14" y="14" width="792" height="86" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Client (form) (2)</text><g id="pipeline-fieldchange-n1"><title>Contoso.Project.onRegionChange — script · client</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#f2f4f7" fill-opacity="1"/><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">client · script</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Contoso.Project.onRegionChange</text></g><g id="pipeline-fieldchange-n2"><title>Default region — business rule · rule · inferred</title><rect x="22" y="70" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><rect x="23" y="71" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · business rule</text><text x="71" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">≈ Default region</text></g></g><rect x="14" y="118" width="12" height="12" rx="2" fill="#f2f4f7" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="128" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">client</text><rect x="130" y="118" width="12" height="12" rx="2" fill="#f4e8c2" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="148" y="128" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">rule</text><rect x="246" y="118" width="12" height="12" rx="2" fill="#ffffff" fill-opacity="1" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><text x="264" y="128" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">≈ inferred</text></svg>
+<figcaption>Execution order for FieldChange</figcaption>
+</figure>
+<h4>Client (form)</h4>
+<ul>
+<li><span class="name">Contoso.Project.onRegionChange</span> — form script · <span class="badge badge-client">client</span> · enabled · filtering: contoso_region · form: Project · library: contoso_/scripts/project.js · function: Contoso.Project.onRegionChange · form event: onchange</li>
+<li><span class="name">Default region</span> — business rule · <span class="badge badge-rule">rule</span> · enabled · filtering: contoso_accountid · form: Project · scope: Form · actions: SetDefaultValue, SetVisibility · touches: contoso_region · confidence: heuristic</li>
+</ul>
+<h3 id="pipeline-any">Any</h3>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="176" viewBox="0 0 820 176" role="img"><title>Execution pipeline for Any on Project (contoso_project)</title><desc>3 items in 1 stages, in execution order: Always (data rule) 3. Alternate keys, cascades and computed columns are grouped under the &quot;Always&quot; stage and are not part of the ordered chain.</desc><rect x="0" y="0" width="820" height="176" fill="#ffffff"/><g data-stage="always"><rect x="14" y="14" width="792" height="112" fill="#ffffff" stroke="#8d97a1" stroke-width="1"/><rect x="15" y="15" width="790" height="21" fill="#eceff3"/><line x1="14" y1="36" x2="806" y2="36" stroke="#8d97a1" stroke-width="1"/><text x="22" y="29" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b" font-weight="600">Always (data rule) (3)</text><g id="pipeline-any-n1"><title>Auditing — audit · rule</title><rect x="22" y="44" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="45" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · audit</text><text x="71" y="59" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Auditing</text></g><g id="pipeline-any-n2"><title>Finance managers — field security · rule</title><rect x="22" y="70" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1"/><rect x="23" y="71" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · field security</text><text x="71" y="85" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">Finance managers</text></g><g id="pipeline-any-n3"><title>Margin — formula · rule · inferred</title><rect x="22" y="96" width="776" height="22" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><rect x="23" y="97" width="10" height="20" fill="#f4e8c2" fill-opacity="1"/><text x="791" y="111" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b" text-anchor="end">rule · formula</text><text x="71" y="111" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="11" fill="#1b1b1b">≈ Margin</text></g></g><rect x="14" y="144" width="12" height="12" rx="2" fill="#f4e8c2" fill-opacity="1" stroke="#4a5560" stroke-width="1"/><text x="32" y="154" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">rule</text><rect x="130" y="144" width="12" height="12" rx="2" fill="#ffffff" fill-opacity="1" stroke="#4a5560" stroke-width="1" stroke-dasharray="1 2"/><text x="148" y="154" font-family="Segoe UI, Segoe UI Web, Arial, Helvetica, sans-serif" font-size="10" fill="#5c636b">≈ inferred</text></svg>
+<figcaption>Execution order for Any</figcaption>
+</figure>
+<h4>Always (data rule)</h4>
+<ul>
+<li><span class="name">Auditing</span> — audit · <span class="badge badge-rule">rule</span> · enabled · note: Auditing is on for the organization and for the table; audited columns are recorded on Create, Update and Delete.</li>
+<li><span class="name">Finance managers</span> — field security profile · <span class="badge badge-rule">rule</span> · enabled · profile: Finance managers · touches: contoso_confidentialnotes</li>
+<li><span class="name">Margin</span> — formula column · <span class="badge badge-rule">rule</span> · enabled · formula: contoso_budget * 0.2 · touches: contoso_budget · confidence: heuristic</li>
+</ul>
+</section>
+<section>
+<h2 id="forms">Forms <span class="count">(2)</span></h2>
+<h3 id="form-project">Project (Main · Active · default)</h3>
+<p class="meta">Libraries: contoso_/scripts/project.js</p>
+<h4>Handlers</h4>
+<table>
+<thead>
+<tr><th>Event</th><th>Column / control</th><th>Function</th><th>Library</th><th>Enabled</th><th>Pass context</th><th>Parameters</th></tr>
+</thead>
+<tbody>
+<tr><td>onload</td><td>—</td><td>Contoso.Project.onLoad</td><td>contoso_/scripts/project.js</td><td>yes</td><td>yes</td><td>—</td></tr>
+<tr><td>onchange</td><td>contoso_region</td><td>Contoso.Project.onRegionChange</td><td>contoso_/scripts/project.js</td><td>yes</td><td>yes</td><td>&quot;EMEA|APAC&quot;</td></tr>
+</tbody>
+</table>
+<h4>PCF and components</h4>
+<table>
+<thead>
+<tr><th>Type</th><th>Name</th><th>Column</th><th>Location</th><th>Details</th></tr>
+</thead>
+<tbody>
+<tr><td>PCF</td><td>Contoso.Controls.BudgetGauge</td><td>contoso_budget</td><td>General › Financials</td><td>region body</td></tr>
+<tr><td>IFrame</td><td>IFrame: IFRAME_Portal</td><td>—</td><td>Portal › Portal</td><td>url https://portal.contoso.com/projects?…, region body</td></tr>
+</tbody>
+</table>
+<p class="meta">Business rules: Default region (form)</p>
+<h3 id="form-project-quick-create">Project quick create (Quick Create · Active)</h3>
+<p class="meta">Libraries: none</p>
+<h4>Handlers</h4>
+<p class="none">None</p>
+<h4>PCF and components</h4>
+<p class="none">None</p>
+<p class="meta">Business rules: none</p>
+</section>
+<section>
+<h2 id="columns">Columns <span class="count">(10)</span></h2>
+<p class="meta">10 of 14 columns with logic (triggers, touched by, required, secured, audited or computed).</p>
+<table>
+<thead>
+<tr><th>Column</th><th>Display name</th><th>Type</th><th>Flags</th><th>Source</th><th>Triggers</th><th>Touched by</th></tr>
+</thead>
+<tbody>
+<tr><td>contoso_accountid</td><td>Customer</td><td>Lookup</td><td>—</td><td>simple</td><td>Default region</td><td>Create kickoff tasks</td></tr>
+<tr><td>contoso_budget</td><td>Budget</td><td>Money</td><td>audited</td><td>simple</td><td>Contoso.Plugins.ProjectRollup: Update of contoso_project, Sync budget to finance, Validate budget</td><td>Contoso.Controls.BudgetGauge, Margin, Validate budget</td></tr>
+<tr><td>contoso_code</td><td>Project code</td><td>String</td><td>—</td><td>autonumber PRJ-{SEQNUM:5}</td><td>—</td><td>Contoso.Plugins.ProjectNumbering: Create of contoso_project, Project code</td></tr>
+<tr><td>contoso_confidentialnotes</td><td>Confidential notes</td><td>Memo</td><td>secured</td><td>simple</td><td>—</td><td>Finance managers</td></tr>
+<tr><td>contoso_margin</td><td>Margin</td><td>Decimal</td><td>—</td><td>formula</td><td>Sync budget to finance</td><td>Contoso.Plugins.ProjectRollup: Update of contoso_project, Validate budget</td></tr>
+<tr><td>contoso_name</td><td>Name</td><td>String</td><td>required, audited</td><td>simple</td><td>—</td><td>Create kickoff tasks, Name, Projects with the same name</td></tr>
+<tr><td>contoso_projectid</td><td>Project</td><td>Uniqueidentifier</td><td>required</td><td>simple</td><td>—</td><td>—</td></tr>
+<tr><td>contoso_region</td><td>Region</td><td>Picklist</td><td>—</td><td>simple</td><td>Contoso.Project.onRegionChange</td><td>Default region</td></tr>
+<tr><td>contoso_status</td><td>Project status</td><td>Picklist</td><td>—</td><td>simple</td><td>Contoso.Plugins.ProjectRollup: Update of contoso_project</td><td>—</td></tr>
+<tr><td>ownerid</td><td>Owner</td><td>Owner</td><td>required, system</td><td>simple</td><td>—</td><td>—</td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2 id="data-rules">Data rules</h2>
+<h3 id="rules-keys">Keys</h3>
+<ul>
+<li>Project code (Active): contoso_code</li>
+</ul>
+<h3 id="rules-duplicate-rules">Duplicate rules</h3>
+<ul>
+<li>Projects with the same name (Published) — contoso_project ↔ contoso_project<ul><li>contoso_name ↔ contoso_name (Exact Match, ignore blanks)</li></ul></li>
+</ul>
+<h3 id="rules-cascades">Cascades</h3>
+<ul>
+<li>contoso_project → contoso_task (via contoso_projectid)<ul><li>Assign: Cascade</li><li>Delete: Cascade (chain depth 2)</li></ul></li>
+</ul>
+<h3 id="rules-field-security-profiles">Field security profiles</h3>
+<ul>
+<li>Finance managers: contoso_confidentialnotes (read Allowed, create Not Allowed, update Allowed)</li>
+</ul>
+<h3 id="rules-audit">Audit</h3>
+<ul>
+<li>Auditing: effective (organization on, table on) — Auditing is on for the organization and for the table; audited columns are recorded on Create, Update and Delete.</li>
+<li>Audited columns: contoso_budget, contoso_name</li>
+</ul>
+<h3 id="rules-required-columns">Required columns</h3>
+<p>contoso_name (Name), contoso_projectid (Project), ownerid (Owner)</p>
+</section>
+<section>
+<h2 id="touched-by">Touched by <span class="count">(2)</span></h2>
+<p class="meta">Flows and actions that read or write contoso_project without being triggered by it.</p>
+<h3 id="touched-write">Write</h3>
+<ul>
+<li><span class="name">Close stale projects</span> — cloud flow · disabled · trigger: recurrence · operations: ListRecords (List_stale_projects), UpdateRecord (Apply_to_each/Update_project) · touches: statecode, statuscode</li>
+</ul>
+<h3 id="touched-read">Read</h3>
+<ul>
+<li><span class="name">Weekly project digest</span> — cloud flow · enabled · trigger: recurrence · operations: ListRecords (List_projects)</li>
+</ul>
+</section>
+<section>
+<h2 id="apps">Apps <span class="count">(2)</span></h2>
+<table>
+<thead>
+<tr><th>App</th><th>Unique name</th><th>State</th><th>Managed</th></tr>
+</thead>
+<tbody>
+<tr><td>Contoso Field Service</td><td>contoso_FieldService</td><td>Active</td><td>yes</td></tr>
+<tr><td>Project Hub</td><td>contoso_ProjectHub</td><td>Active</td><td>no</td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2 id="other-dependencies">Other dependencies <span class="count">(1)</span></h2>
+<p class="meta">Components that depend on the table and are not represented above (views, charts, dashboards, ...).</p>
+<table>
+<thead>
+<tr><th>Component type</th><th>Name</th><th>Object id</th></tr>
+</thead>
+<tbody>
+<tr><td>Saved Query (26)</td><td>Active Projects</td><td>e1f2a3b4-00a1-4000-8000-0000000000a1</td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2 id="source-errors">Source errors <span class="count">(1)</span></h2>
+<ul>
+<li><strong>customApis</strong> (permission): HTTP 403: Principal user is missing prvReadCustomAPI privilege — this map is missing what that source would have found</li>
+</ul>
+</section>
+</main>
+</body>
+</html>

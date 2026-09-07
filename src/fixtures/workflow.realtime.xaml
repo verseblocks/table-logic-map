@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Activity x:Class="XrmWorkflow0f1e2d3c4b5a69788796a5b4c3d2e1f0" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mcwb="clr-namespace:Microsoft.Crm.Workflow.BusinessProcessFlowActivities;assembly=Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:mxs="clr-namespace:Microsoft.Xrm.Sdk;assembly=Microsoft.Xrm.Sdk, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:mxswa="clr-namespace:Microsoft.Xrm.Sdk.Workflow.Activities;assembly=Microsoft.Xrm.Sdk.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:s="clr-namespace:System;assembly=mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" xmlns:this="clr-namespace:" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="InputEntities" Type="InArgument(scg:IDictionary(x:String, mxs:Entity))" />
+    <x:Property Name="CreatedEntities" Type="InArgument(scg:IDictionary(x:String, mxs:Entity))" />
+  </x:Members>
+  <this:XrmWorkflow0f1e2d3c4b5a69788796a5b4c3d2e1f0.InputEntities>
+    <InArgument x:TypeArguments="scg:IDictionary(x:String, mxs:Entity)" />
+  </this:XrmWorkflow0f1e2d3c4b5a69788796a5b4c3d2e1f0.InputEntities>
+  <this:XrmWorkflow0f1e2d3c4b5a69788796a5b4c3d2e1f0.CreatedEntities>
+    <InArgument x:TypeArguments="scg:IDictionary(x:String, mxs:Entity)" />
+  </this:XrmWorkflow0f1e2d3c4b5a69788796a5b4c3d2e1f0.CreatedEntities>
+  <mva:VisualBasic.Settings>Assembly references and imported namespaces for internal implementation</mva:VisualBasic.Settings>
+  <mxswa:Workflow>
+    <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionStep1: If budget is large">
+      <mxswa:ActivityReference.Properties>
+        <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+        <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+          <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.ConditionSequence, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionStep1">
+            <mxswa:ActivityReference.Properties>
+              <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+              <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.ConditionBranch, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionBranchStep2">
+                  <mxswa:ActivityReference.Properties>
+                    <sco:Collection x:TypeArguments="Variable" x:Key="Variables">
+                      <Variable x:TypeArguments="x:Object" Name="ConditionBranchStep2_1" />
+                      <Variable x:TypeArguments="x:Object" Name="ConditionBranchStep2_2" />
+                    </sco:Collection>
+                    <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.Condition, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="ConditionStep3">
+                        <mxswa:ActivityReference.Arguments>
+                          <InArgument x:TypeArguments="x:Boolean" x:Key="Wait">False</InArgument>
+                          <InArgument x:TypeArguments="x:String" x:Key="Condition">[ConditionBranchStep2_1]</InArgument>
+                        </mxswa:ActivityReference.Arguments>
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:GetEntityProperty Attribute="contoso_budget" Entity="[InputEntities(&quot;primaryEntity&quot;)]" EntityName="contoso_project" Value="[ConditionBranchStep2_2]">
+                              <mxswa:GetEntityProperty.TargetType>
+                                <InArgument x:TypeArguments="s:Type">
+                                  <mxswa:ReferenceLiteral x:TypeArguments="s:Type" Value="mxs:Money" />
+                                </InArgument>
+                              </mxswa:GetEntityProperty.TargetType>
+                            </mxswa:GetEntityProperty>
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.EvaluateExpression, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="EvaluateExpression">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="x:String" x:Key="ExpressionOperator">GreaterThan</InArgument>
+                                <InArgument x:TypeArguments="s:Object[]" x:Key="Parameters">[New Object() { ConditionBranchStep2_2, Microsoft.Xrm.Sdk.Workflow.WorkflowPropertyType.Money, "100000" }]</InArgument>
+                                <InArgument x:TypeArguments="s:Type" x:Key="TargetType">[GetType(Boolean)]</InArgument>
+                                <OutArgument x:TypeArguments="x:Object" x:Key="Result">[ConditionBranchStep2_1]</OutArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="UpdateStep4: Update Project">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables">
+                            <Variable x:TypeArguments="x:Object" Name="UpdateStep4_1" />
+                            <Variable x:TypeArguments="x:Object" Name="UpdateStep4_2" />
+                          </sco:Collection>
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.UpdateEntity, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="UpdateStep4">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="mxs:Entity" x:Key="Entity">[InputEntities("primaryEntity")]</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                              <mxswa:ActivityReference.Properties>
+                                <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                                <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                                  <mxswa:SetEntityProperty Attribute="contoso_flagged" Entity="[InputEntities(&quot;primaryEntity&quot;)]" EntityName="contoso_project" Value="[UpdateStep4_1]">
+                                    <mxswa:SetEntityProperty.TargetType>
+                                      <InArgument x:TypeArguments="s:Type">
+                                        <mxswa:ReferenceLiteral x:TypeArguments="s:Type" Value="x:Boolean" />
+                                      </InArgument>
+                                    </mxswa:SetEntityProperty.TargetType>
+                                  </mxswa:SetEntityProperty>
+                                  <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.SetAttributeValue, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetAttributeValue">
+                                    <mxswa:ActivityReference.Arguments>
+                                      <InArgument x:TypeArguments="x:String" x:Key="Attribute">contoso_reviewdate</InArgument>
+                                      <InArgument x:TypeArguments="mxs:Entity" x:Key="Entity">[InputEntities("primaryEntity")]</InArgument>
+                                      <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                      <InArgument x:TypeArguments="x:Object" x:Key="Value">[UpdateStep4_2]</InArgument>
+                                    </mxswa:ActivityReference.Arguments>
+                                  </mxswa:ActivityReference>
+                                  <mxswa:UpdateEntity Entity="[InputEntities(&quot;primaryEntity&quot;)]" EntityName="contoso_project" />
+                                </sco:Collection>
+                              </mxswa:ActivityReference.Properties>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="AssignStep5: Assign to finance">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.AssignEntity, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="AssignStep5">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="mxs:Entity" x:Key="Entity">[InputEntities("primaryEntity")]</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="mxs:EntityReference" x:Key="Owner">[New EntityReference("team", New Guid("11111111-2222-3333-4444-555555555555"))]</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="CreateStep6: Create review task">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.CreateEntity, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="CreateStep6">
+                              <mxswa:ActivityReference.Arguments>
+                                <OutArgument x:TypeArguments="mxs:Entity" x:Key="Entity">[CreatedEntities("CreateStep6_localParameter#Temp")]</OutArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">task</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                              <mxswa:ActivityReference.Properties>
+                                <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                                <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                                  <mxswa:SetEntityProperty Attribute="subject" Entity="[CreatedEntities(&quot;CreateStep6_localParameter#Temp&quot;)]" EntityName="task" Value="[&quot;Review project budget&quot;]" />
+                                  <mxswa:SetEntityProperty Attribute="regardingobjectid" Entity="[CreatedEntities(&quot;CreateStep6_localParameter#Temp&quot;)]" EntityName="task" Value="[InputEntities(&quot;primaryEntity&quot;).ToEntityReference()]" />
+                                </sco:Collection>
+                              </mxswa:ActivityReference.Properties>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                      <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetStateStep7: Deactivate">
+                        <mxswa:ActivityReference.Properties>
+                          <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+                          <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                            <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.SetState, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SetStateStep7">
+                              <mxswa:ActivityReference.Arguments>
+                                <InArgument x:TypeArguments="mxs:Entity" x:Key="Entity">[InputEntities("primaryEntity")]</InArgument>
+                                <InArgument x:TypeArguments="x:String" x:Key="EntityName">contoso_project</InArgument>
+                                <InArgument x:TypeArguments="mxs:OptionSetValue" x:Key="State">[New OptionSetValue(1)]</InArgument>
+                                <InArgument x:TypeArguments="mxs:OptionSetValue" x:Key="Status">[New OptionSetValue(2)]</InArgument>
+                              </mxswa:ActivityReference.Arguments>
+                            </mxswa:ActivityReference>
+                          </sco:Collection>
+                        </mxswa:ActivityReference.Properties>
+                      </mxswa:ActivityReference>
+                    </sco:Collection>
+                  </mxswa:ActivityReference.Properties>
+                </mxswa:ActivityReference>
+              </sco:Collection>
+            </mxswa:ActivityReference.Properties>
+          </mxswa:ActivityReference>
+        </sco:Collection>
+      </mxswa:ActivityReference.Properties>
+    </mxswa:ActivityReference>
+    <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.StepComposite, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SendEmailStep8: Notify owner">
+      <mxswa:ActivityReference.Properties>
+        <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+        <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+          <mxswa:ActivityReference AssemblyQualifiedName="Microsoft.Crm.Workflow.Activities.SendEmail, Microsoft.Crm.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" DisplayName="SendEmailStep8">
+            <mxswa:ActivityReference.Arguments>
+              <InArgument x:TypeArguments="mxs:Entity" x:Key="Entity">[CreatedEntities("SendEmailStep8_localParameter#Temp")]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="EntityName">email</InArgument>
+              <InArgument x:TypeArguments="x:Boolean" x:Key="UseTemplate">False</InArgument>
+            </mxswa:ActivityReference.Arguments>
+            <mxswa:ActivityReference.Properties>
+              <sco:Collection x:TypeArguments="Variable" x:Key="Variables" />
+              <sco:Collection x:TypeArguments="Activity" x:Key="Activities">
+                <mxswa:SetEntityProperty Attribute="subject" Entity="[CreatedEntities(&quot;SendEmailStep8_localParameter#Temp&quot;)]" EntityName="email" Value="[&quot;Project &quot; &amp; InputEntities(&quot;primaryEntity&quot;)(&quot;contoso_name&quot;) &amp; &quot; updated&quot;]" />
+              </sco:Collection>
+            </mxswa:ActivityReference.Properties>
+          </mxswa:ActivityReference>
+        </sco:Collection>
+      </mxswa:ActivityReference.Properties>
+    </mxswa:ActivityReference>
+  </mxswa:Workflow>
+</Activity>

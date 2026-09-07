@@ -1,0 +1,18 @@
+[
+    {
+        "@odata.etag": "W/\"3001\"",
+        "serviceendpointid": "88888888-8888-4888-8888-000000000001",
+        "name": "Contoso Webhook",
+        "contract": 8,
+        "url": "https://hooks.contoso.example/api/project?code=SECRET-KEY&clientId=abc",
+        "messageformat": 3
+    },
+    {
+        "@odata.etag": "W/\"3002\"",
+        "serviceendpointid": "88888888-8888-4888-8888-000000000002",
+        "name": "Contoso Service Bus Queue",
+        "contract": 2,
+        "url": "sb://contoso.servicebus.windows.net/",
+        "messageformat": 1
+    }
+]
