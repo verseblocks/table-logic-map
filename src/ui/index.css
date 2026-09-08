@@ -489,3 +489,45 @@ button.tlm-chip:focus-visible {
     color: var(--colorPaletteDarkOrangeForeground1);
     font-size: 12px;
 }
+
+/* ---- VerseBlocks attribution footer ---- */
+
+.tlm-brand {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 3px 12px;
+    background: var(--colorNeutralBackground1);
+    border-top: 1px solid var(--colorNeutralStroke2);
+}
+
+.tlm-brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--colorNeutralForeground3);
+    font-family: inherit;
+    font-size: 11px;
+    line-height: 18px;
+    cursor: pointer;
+}
+
+.tlm-brand-link strong {
+    color: var(--colorNeutralForeground2);
+    font-weight: 600;
+}
+
+.tlm-brand-link:hover {
+    background: var(--colorNeutralBackground1Hover);
+    color: var(--colorNeutralForeground2);
+}
+
+.tlm-brand-link:focus-visible {
+    outline: none;
+    border-color: var(--colorStrokeFocus2);
+}

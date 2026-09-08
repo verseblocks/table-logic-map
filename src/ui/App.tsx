@@ -4,6 +4,7 @@
  */
 import { FluentProvider, Tab, TabList, webDarkTheme, webLightTheme, type SelectTabData } from '@fluentui/react-components';
 import { useEffect } from 'react';
+import { BrandFooter } from './components/Brand';
 import { DetailPane } from './components/DetailPane';
 import { Header } from './components/Header';
 import { Notices } from './components/Notices';
@@ -96,6 +97,7 @@ export default function App() {
                     </main>
                     <DetailPane />
                 </div>
+                <BrandFooter />
             </div>
         </FluentProvider>
     );

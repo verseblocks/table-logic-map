@@ -1,6 +1,6 @@
 {
   "name": "@verseblocks/pptb-table-logic-map",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "Table Logic Map",
   "description": "See everything that runs on a Dataverse table: plugins, workflows, cloud flows, business rules, form scripts, PCF, data rules - organized by event and pipeline stage. Exports Markdown/JSON and is invokable by AI agents through the PPTB MCP server.",
   "main": "index.html",
@@ -15,7 +15,7 @@
   ],
   "configurations": {
     "repository": "https://github.com/verseblocks/table-logic-map",
-    "website": "https://github.com/verseblocks/table-logic-map#readme",
+    "website": "https://www.verseblocks.com/tools",
     "readmeUrl": "https://raw.githubusercontent.com/verseblocks/table-logic-map/main/README.md"
   },
   "features": {
