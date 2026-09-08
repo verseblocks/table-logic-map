@@ -13,7 +13,7 @@
 
 Export the whole map as **Markdown** (wiki-ready, with Mermaid diagrams), **JSON** (`schemaVersion: 1`) or a single self-contained **HTML** file (opens in a browser or Microsoft Word, prints to PDF, works offline), and let AI assistants ask for it through the **Power Platform ToolBox MCP server** – the tool is agent-invokable in both windowed and headless mode.
 
-Published by [VerseBlocks](https://github.com/VerseBlocks) for [Power Platform ToolBox](https://www.powerplatformtoolbox.com/).
+Published by [VerseBlocks](https://www.verseblocks.com/) for [Power Platform ToolBox](https://www.powerplatformtoolbox.com/).
 
 ## Why
 
