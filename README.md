@@ -35,9 +35,9 @@ The tool uses a single Dataverse connection and needs **no CSP exceptions**; eve
 
 ## Using the tool
 
-![Concept illustration of the Pipeline tab](https://raw.githubusercontent.com/verseblocks/table-logic-map/main/docs/assets/concept-pipeline.png)
+![The Pipeline tab, showing a table's logic grouped by event and execution stage](https://raw.githubusercontent.com/verseblocks/table-logic-map/main/docs/assets/screens/pipeline.png)
 
-*Concept illustration – real screenshots follow the first marketplace release.*
+The **Pipeline** tab is the default view: pick a table and every piece of logic is laid out by event, then by the stage the platform runs it in. The header carries the table's facts and counts, the strip below it shows each of the fifteen sources completing independently, and smells are surfaced as badges before you go looking for them.
 
 1. Pick a table (search by display or logical name; the last 10 tables per environment are remembered).
 2. The header appears as soon as the table metadata arrives; every tab fills in progressively as its source completes. Sources fail independently – a missing privilege on plugin steps produces a warning banner, not a failed map.
@@ -52,6 +52,18 @@ The tool uses a single Dataverse connection and needs **no CSP exceptions**; eve
 4. Select any item to open the detail pane: all details, **Open in browser** (maker portal / classic record), **Copy as Markdown**.
 5. **Export** → Markdown, JSON or HTML, optionally with a pipeline diagram per event (*Include diagrams*).
 
+### Columns: what triggers a field, and what writes to it
+
+![The Columns tab, listing every column with its type, flags and source type](https://raw.githubusercontent.com/verseblocks/table-logic-map/main/docs/assets/screens/columns.png)
+
+The quickest way to answer "why did this field change?". Each column carries its type, required, secured and audited flags, whether it is simple, calculated, rollup or formula, and two chip columns linking it to the logic that triggers on it or writes to it. *Only columns with logic* hides the rest.
+
+### Forms: the client-side half
+
+![The Forms tab, one card per form with libraries, handlers, PCF controls and business rules](https://raw.githubusercontent.com/verseblocks/table-logic-map/main/docs/assets/screens/forms.png)
+
+One card per form, listing the JavaScript libraries and event handlers, the PCF controls and embedded components, and the business rules that apply. This is the logic that never appears in a plugin registration tool.
+
 ### Export formats
 
 | Format | What it is for |
@@ -61,6 +73,10 @@ The tool uses a single Dataverse connection and needs **no CSP exceptions**; eve
 | **HTML** (`.html`) | The client-ready deliverable: one self-contained file with inline styles and inline SVG diagrams, no network access needed. It renders in any browser, opens in Microsoft Word (which converts the HTML, so save as `.docx` there if you need one) and prints to PDF. |
 
 All three contain the same map, honour the current view filters and are deterministic, so re-exporting the same table produces the same bytes.
+
+![The HTML export: contents, badge legend, smells with explanations, and the pipeline as an inline SVG diagram](https://raw.githubusercontent.com/verseblocks/table-logic-map/main/docs/assets/screens/export.png)
+
+The HTML export opens with a linked table of contents and a legend explaining what each execution mode means, then repeats every section of the app. Each smell states not just what it found but why it matters. [See a full example](https://raw.githubusercontent.com/verseblocks/table-logic-map/main/docs/assets/sample-logic-map.html) rendered from the project's test fixture.
 
 ## Exact vs. heuristic
 

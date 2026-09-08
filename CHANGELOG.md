@@ -16,6 +16,7 @@ All notable changes to this project are documented here. The format follows
 - HTML export: one self-contained document (inline stylesheet, inline SVG pipeline diagrams, no scripts and no external resources) carrying the same sections as the Markdown export. It renders offline in any browser, opens in Microsoft Word and carries a print stylesheet for printing to PDF. Every value read from Dataverse is HTML-escaped, so a record name containing markup cannot produce executable output. The single *Include diagrams* toggle now covers both formats: Mermaid code blocks in Markdown, inline SVG in HTML.
 - Agent integration: `pptb.config.json` invocation/agents contract, windowed launch context handling and a headless `dist/headless.js` entry for the PPTB MCP server.
 - Progressive rendering, independent source failure handling, retry with backoff and paging in the data layer.
+- README screenshots of the Pipeline, Columns and Forms tabs and of the HTML export, taken against a real environment, replacing the placeholder illustration.
 
 ### Fixed
 
