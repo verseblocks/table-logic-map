@@ -1,6 +1,6 @@
 {
   "name": "@verseblocks/pptb-table-logic-map",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Table Logic Map",
   "description": "See everything that runs on a Dataverse table: plugins, workflows, cloud flows, business rules, form scripts, PCF, data rules - organized by event and pipeline stage. Exports Markdown/JSON and is invokable by AI agents through the PPTB MCP server.",
   "main": "index.html",
@@ -69,24 +69,22 @@
     "version-stable": "npm version patch --no-git-tag-version",
     "publish-package": "npm run finalize-package && npm publish --access public"
   },
-  "dependencies": {
+  "devDependencies": {
     "@fluentui/react-components": "^9.74.7",
     "@fluentui/react-icons": "^2.0.339",
-    "@tanstack/react-virtual": "^3.14.10",
-    "fast-xml-parser": "^5.11.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "zustand": "^5.0.15"
-  },
-  "devDependencies": {
     "@pptb/types": "^1.2.5",
     "@pptb/validate": "^1.0.1",
+    "@tanstack/react-virtual": "^3.14.10",
     "@types/node": "^24.0.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.1.1",
+    "fast-xml-parser": "^5.11.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "typescript": "~5.9.3",
     "vite": "^8.2.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.0",
+    "zustand": "^5.0.15"
   }
 }
